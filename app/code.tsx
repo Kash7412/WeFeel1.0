@@ -1,4 +1,4 @@
-import { Stack } from "expo-router"
+import { router, Stack } from "expo-router"
 import { View, Text, KeyboardAvoidingView, Platform, TextInput } from "react-native"
 import { StyleSheet } from 'react-native';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ const Code = () => {
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
             <View style={{ position: 'absolute', top: 10, left: 20 }}>
-                <Text style={styles.subtitle}>enter code</Text>
+                <Text style={styles.subtitle} onPress={() => router.push('/explainer')}>enter code</Text>
                 <Text style={styles.subtitle2}>code sent to (872) 803-4275</Text>
             </View>
             <TextInput
