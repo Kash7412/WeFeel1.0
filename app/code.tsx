@@ -34,7 +34,7 @@ const Code = () => {
                 keyboardType="numeric"
                 maxLength={7} // 6 digits + 1 dash
             />
-872        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
     )
 };
 
@@ -80,16 +80,18 @@ const styles = StyleSheet.create({
       lineHeight: 48,
     },
     input: {
-      flex: 1,
-      height: 20,
+      height: 70,
+      marginTop: '30%',
       backgroundColor: '#1E1E1E',
       borderRadius: 25,
       color: '#ffffff',
-      paddingHorizontal: 20,
-      fontSize: 15,
+      paddingHorizontal: 5,
+      paddingVertical: 5,
+      fontSize: 40,
       fontFamily: 'Hind_700Bold',
       borderWidth: 1,
       borderColor: '#333',
+      width: '70%', // Changed from 80% to 90%
     },
     inputContainer: {
       width: '80%',
