@@ -1,7 +1,7 @@
-import { router, Stack } from "expo-router"
-import { View, Text, KeyboardAvoidingView, Platform, TextInput } from "react-native"
-import { StyleSheet } from 'react-native';
+import { router } from "expo-router";
+import { View, Text, KeyboardAvoidingView, Platform, TextInput, Pressable, StyleSheet } from "react-native";
 import React, { useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
 
 const Code = () => {
     const [verificationCode, setVerificationCode] = useState('');
@@ -16,106 +16,101 @@ const Code = () => {
         }
     };
 
+    const handleEnterPress = () => {
+        router.push('/explainer');
+    };
+
     return (
         <KeyboardAvoidingView 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
-            <View style={{ position: 'absolute', top: 10, left: 20 }}>
-                <Text style={styles.subtitle} onPress={() => router.push('/explainer')}>enter code</Text>
-                <Text style={styles.subtitle2}>code sent to (872) 803-4275</Text>
+            <View style={styles.textContainer}>
+                <Text style={styles.subtitle}>Enter Code</Text>
+                <Text style={styles.subtitle2}>Code sent to (872) 803-4275</Text>
             </View>
-            <TextInput
-                style={styles.input}
-                value={verificationCode}
-                onChangeText={handleChange}
-                placeholder="###-###"
-                keyboardType="numeric"
-                maxLength={7} // 6 digits + 1 dash
-            />
-            </KeyboardAvoidingView>
-    )
+
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={verificationCode}
+                    onChangeText={handleChange}
+                    placeholder="###-###"
+                    keyboardType="numeric"
+                    maxLength={7} // 6 digits + 1 dash
+                />
+                <Pressable 
+                    style={({ pressed }) => [
+                        styles.nextButton,
+                        pressed && styles.nextButtonPressed
+                    ]}
+                    onPress={handleEnterPress}
+                >
+                    <AntDesign name="arrowright" size={24} color="white" />
+                </Pressable>
+            </View>
+        </KeyboardAvoidingView>
+    );
 };
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      alignItems: "center",
-      padding: 24,
-      backgroundColor: "black",
-    },
-    scrollContainer: {
-      flexGrow: 1,
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingBottom: 20,
+        flex: 1,
+        alignItems: "center",
+        padding: 24,
+        backgroundColor: "black",
     },
     textContainer: {
-      alignItems: 'center',
-      marginTop: '40%',
-    },
-    main: {
-      flex: 1,
-      justifyContent: "center",
-      maxWidth: 960,
-      marginHorizontal: "auto",
-    },
-    title: {
-      fontFamily: 'Gluten_700Bold',
-      fontSize: 78,
-      color: '#ffffff',
-      marginBottom: 10,
+        alignItems: 'center',
+        position: 'absolute',
+        top: 40,
     },
     subtitle: {
-      fontFamily: 'Hind_700',
-      fontSize: 40,
-      color: '#ffffff',
-      lineHeight: 48,
+        fontFamily: 'Hind_700',
+        fontSize: 40,
+        color: '#ffffff',
+        lineHeight: 48,
     },
     subtitle2: {
-      fontFamily: 'Hind_700',
-      fontSize: 16,
-      color: '#ffffff',
-      lineHeight: 48,
-    },
-    input: {
-      height: 70,
-      marginTop: '30%',
-      backgroundColor: '#1E1E1E',
-      borderRadius: 25,
-      color: '#ffffff',
-      paddingHorizontal: 5,
-      paddingVertical: 5,
-      fontSize: 40,
-      fontFamily: 'Hind_700Bold',
-      borderWidth: 1,
-      borderColor: '#333',
-      width: '70%', // Changed from 80% to 90%
+        fontFamily: 'Hind_700',
+        fontSize: 16,
+        color: '#ffffff',
+        lineHeight: 24,
     },
     inputContainer: {
-      width: '80%',
-      marginBottom: 40,
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '80%',
+        marginTop: '30%',
+        gap: 10,
     },
-    inputRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      width: '100%',
-      gap: 10,
+    input: {
+        flex: 1,
+        height: 60,
+        backgroundColor: '#1E1E1E',
+        borderRadius: 25,
+        color: '#ffffff',
+        paddingHorizontal: 20,
+        fontSize: 20,
+        fontFamily: 'Hind_700Bold',
+        borderWidth: 1,
+        borderColor: '#333',
+        textAlign: 'center',
     },
     nextButton: {
-      width: 60,
-      height: 60,
-      backgroundColor: '#333',
-      borderRadius: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: '#444',
+        width: 60,
+        height: 60,
+        backgroundColor: '#333',
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#444',
     },
     nextButtonPressed: {
-      backgroundColor: '#444',
+        backgroundColor: '#444',
     },
-  });
+});
 
 export default Code;
