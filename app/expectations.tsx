@@ -5,6 +5,8 @@ import React from "react";
 const Expectations = () => {
   const router = useRouter();
 
+
+
   return (
     <View style={styles.container}>
       {/* Main Content */}
@@ -32,7 +34,7 @@ const Expectations = () => {
           humans and AI moderate all videos before sharing.
         </Text>
         <Pressable
-          onPress={() => router.push("/next")}
+          onPress={() => router.push("/login5")}
           style={styles.nextButton}
         >
           <Text style={styles.nextButtonText}>next</Text>
