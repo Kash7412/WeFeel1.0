@@ -10,7 +10,7 @@ const RecordFirstWeFeel = () => {
   };
 
   const handleReadyPress = () => {
-    router.push("/permissions"); // Navigate to permissions page
+    router.push("/record"); // Navigate to permissions page
   };
 
   return (
@@ -21,17 +21,15 @@ const RecordFirstWeFeel = () => {
       </View>
 
       <View style={styles.container}>
-      <Image 
-        source={require('/Users/Elliot/CascadeProjects/WeFeel1.0/assets/login5image.png')}
-        style={styles.image}
-      />
-    </View>
+        <Image
+          source={require("/Users/Elliot/CascadeProjects/WeFeel1.0/assets/login5image.png")}
+          style={styles.image}
+        />
+      </View>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Give camera and microphone access
-        </Text>
+        <Text style={styles.footerText}>Give camera and microphone access</Text>
         <Pressable style={styles.readyButton} onPress={handleReadyPress}>
           <Text style={styles.readyButtonText}>I’m Ready</Text>
         </Pressable>
@@ -129,7 +127,7 @@ const styles = StyleSheet.create({
     width: 400,
     height: 500,
     borderRadius: 10,
-  }
+  },
 });
 
 export default RecordFirstWeFeel;
