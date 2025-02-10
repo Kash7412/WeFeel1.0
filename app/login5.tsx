@@ -22,7 +22,7 @@ const RecordFirstWeFeel = () => {
 
       <View style={styles.container}>
         <Image
-          source={require("/Users/Elliot/CascadeProjects/WeFeel1.0/assets/login5image.png")}
+          source={require("../assets/login5image.png")}
           style={styles.image}
         />
       </View>

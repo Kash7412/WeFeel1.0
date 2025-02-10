@@ -90,6 +90,27 @@ const RootLayout = () => {
         }}
       />
       <Stack.Screen
+        name="login5"
+        options={{
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "Hind_700Bold",
+                color: "white",
+                fontSize: 20,
+              }}
+            >
+              5/5
+            </Text>
+          ),
+          headerBackTitle: "4/5",
+          headerStyle: {
+            backgroundColor: "black", // Set header background to black
+          },
+          headerTintColor: "white", // Set header title color to white
+        }}
+      />
+      <Stack.Screen
         name="name"
         options={{
           headerTitle: () => (
