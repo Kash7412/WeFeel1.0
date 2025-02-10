@@ -89,6 +89,13 @@ const RootLayout = () => {
           headerTintColor: "white", // Set header title color to white
         }}
       />
+      <Stack.Screen
+        name="record"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 };
