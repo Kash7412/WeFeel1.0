@@ -6,12 +6,22 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { useRouter } from "expo-router";
+import Camera, {
+  CameraView,
+  CameraType,
+  useCameraPermissions,
+} from "expo-camera";
+import type { CameraRecordingOptions } from "expo-camera";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Record = () => {
   const [permission, requestPermission] = useCameraPermissions();
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(5);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [cam, setCam] = useState<CameraView>();
+  const [videoUriPromise, setVideoUriPromise] = useState<Promise<any>>();
+  const router = useRouter();
 
   const [facing, setFacing] = useState<CameraType>("back");
 
@@ -19,10 +29,21 @@ const Record = () => {
     let timer: NodeJS.Timeout;
     if (isCountdownActive && countdown > 0) {
       timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
+    } else if (countdown == 0 && cam) {
+      console.log("countdown done");
+      cam.stopRecording();
+      videoUriPromise
+        ?.then(({ uri }) => {
+          console.log(uri);
+          router.push({ pathname: `/playback`, params: { uri: uri } });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     }
 
     return () => clearTimeout(timer); // Cleanup the timer
-  }, [isCountdownActive, countdown]);
+  }, [isCountdownActive, countdown, cam]);
 
   if (!permission) {
     return <View />;
@@ -30,7 +51,7 @@ const Record = () => {
 
   if (!permission.granted) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Text style={styles.permissionText}>
           We need your permission to access the camera
         </Text>
@@ -40,13 +61,14 @@ const Record = () => {
         >
           <Text style={styles.permissionButtonText}>Grant Permission</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const handleStart = () => {
     setIsCountdownActive(true);
-    setCountdown(10); // Reset countdown when "start" is pressed
+    setCountdown(5); // Reset countdown when "start" is pressed
+    setVideoUriPromise(cam.recordAsync({}));
   };
 
   const toggleCameraFacing = () => {
@@ -68,7 +90,12 @@ const Record = () => {
 
         {/* Camera Rectangle */}
         <View style={styles.cameraContainer}>
-          <CameraView style={styles.camera} facing={facing}>
+          <CameraView
+            style={styles.camera}
+            facing={facing}
+            ref={(ref) => setCam(ref)}
+            mode="video"
+          >
             <View style={styles.overlay}>
               <TouchableOpacity
                 style={styles.flipButton}

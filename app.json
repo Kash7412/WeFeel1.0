@@ -34,7 +34,8 @@
           "microphonePermission": "Allow $WeFeel to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      "expo-video"
     ]
   }
 }
