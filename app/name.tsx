@@ -35,8 +35,7 @@ const Name = () => {
                                 pressed && styles.nextButtonPressed,
                                 { width: '90%', padding: 15, borderRadius: 30 }  // Rounded edges
                             ]}
-                            onPress={() => router.push('/explainer')}
-                        >
+                            onPress={() => router.push('/explainer')}>
                             <Text style={{ color: 'white', textAlign: 'center', fontSize: 18, fontFamily: 'Hind_700'}}>next</Text>
                         </Pressable>
                     </View>

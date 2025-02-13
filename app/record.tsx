@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Camera, {
@@ -68,7 +69,11 @@ const Record = () => {
   const handleStart = () => {
     setIsCountdownActive(true);
     setCountdown(5); // Reset countdown when "start" is pressed
-    setVideoUriPromise(cam.recordAsync({}));
+    if (cam && cam.recordAsync) {
+        setVideoUriPromise(cam.recordAsync({ duration: 5000 }));
+    } else {
+        console.error("Camera is not initialized or does not have recordAsync method");
+    }
   };
 
   const toggleCameraFacing = () => {
@@ -85,7 +90,7 @@ const Record = () => {
       >
         {/* Title */}
         <View style={styles.header}>
-          <Text style={styles.title}>Tell the world how you really feel!</Text>
+          <Text style={styles.title}>tell the world how you really feel!</Text>
         </View>
 
         {/* Camera Rectangle */}
@@ -93,7 +98,7 @@ const Record = () => {
           <CameraView
             style={styles.camera}
             facing={facing}
-            ref={(ref) => setCam(ref)}
+            ref={(ref) => { if (ref !== null && ref !== undefined) setCam(ref); }}
             mode="video"
           >
             <View style={styles.overlay}>
@@ -110,9 +115,11 @@ const Record = () => {
         {/* Countdown Badge */}
         <View style={styles.badgeContainer}>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>
+          <Pressable onPress={() => router.push('/youdidit')}>
+              <Text style={styles.badgeText}>
               {countdown > 0 ? countdown : "Done"}
-            </Text>
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -143,21 +150,37 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
-    marginTop: 100,
-    paddingHorizontal: 20,
+    marginTop: 120,
+    paddingHorizontal: 10,
   },
   title: {
     fontFamily: "Hind_700Bold",
-    fontSize: 40,
+    fontSize: 35,
     color: "white",
     textAlign: "center",
+    lineHeight: 45,
+  },
+  nextButton: {
+    backgroundColor: '#333',
+    borderRadius: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 0,
+    borderColor: '#444',
+    padding: 15, 
+    height: 60,
+    width: '90%',
+    marginBottom: 25,
+  },
+  nextButtonPressed: {
+    backgroundColor: '#444',
   },
   cameraContainer: {
-    width: 300, // Width of the camera rectangle
-    height: 400, // Height of the camera rectangle
+    width: 350, // Width of the camera rectangle
+    height: 450, // Height of the camera rectangle
     borderRadius: 40,
     overflow: "hidden", // Clips anything outside the rectangle
-    marginTop: 20,
+    marginTop: 1,
   },
   camera: {
     flex: 1, // Ensures the camera fills the container

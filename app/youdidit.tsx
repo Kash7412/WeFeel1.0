@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 
-const HomePage = () => {
+const YouDidIt = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const handleNext = () => {
     if (phoneNumber.length > 0) {
@@ -22,35 +22,22 @@ const HomePage = () => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.textContainer}>
+          <Text style={styles.subtitle}>you did it!</Text>
+          <Text style={styles.subtitle}>you sent</Text>
+          <Text style={styles.subtitle}>your first</Text>
           <Text style={styles.title}>WeFeel</Text>
-          <Text style={styles.subtitle}>the world,</Text>
-          <Text style={styles.subtitle}>in 60 seconds</Text>
         </View>
-        
         <View style={styles.inputContainer}>
-          <View style={styles.inputRow}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your phone number"
-              placeholderTextColor="#666"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-            <Pressable 
-              style={({pressed}) => [
-                styles.nextButton,
-                pressed && styles.nextButtonPressed
-              ]}
-              onPress={() => router.push('/code')}
-            >
-              <AntDesign name="arrowright" size={24} color="white" />
-            </Pressable>
+          <View style={{ justifyContent: 'center', width: '100%' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
+              <Pressable
+                onPress={() => router.push("/share")}
+                style={styles.nextButton}
+              >
+                <Text style={styles.nextButtonText}>next</Text>
+              </Pressable>
+            </View>
           </View>
-          <Text style={styles.legalText}>
-            By continuing, you agree to our <Text style={styles.legalLink}>terms of use</Text> and have agreed to our <Text style={styles.legalLink}>privacy policy</Text>.
-          </Text>
         </View>
       </ScrollView>
       <StatusBar style="light" />
@@ -75,6 +62,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: '40%',
   },
+  nextButton: {
+    backgroundColor: "white",
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 15,
+    width: "80%",
+    maxWidth: 300,
+  },
+  nextButtonText: {
+    fontSize: 18,
+    fontFamily: "Hind_700Bold",
+    color: "black",
+    textAlign: "center",
+  },
   main: {
     flex: 1,
     justifyContent: "center",
@@ -86,12 +88,13 @@ const styles = StyleSheet.create({
     fontSize: 78,
     color: '#ffffff',
     marginBottom: 10,
+    marginTop: 20,
   },
   subtitle: {
     fontFamily: 'Hind_700',
-    fontSize: 40,
+    fontSize: 60,
     color: '#ffffff',
-    lineHeight: 48,
+    lineHeight: 60,
   },
   legalText: {
     fontFamily: 'Hind_700',
@@ -109,18 +112,17 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 60,
-    width: '90%',
     backgroundColor: '#1E1E1E',
     borderRadius: 25,
     color: '#ffffff',
-    paddingHorizontal: 10,
-    fontSize: 17,
+    paddingHorizontal: 20,
+    fontSize: 15,
     fontFamily: 'Hind_700Bold',
     borderWidth: 1,
     borderColor: '#333',
   },
   inputContainer: {
-    width: '95%',
+    width: '100%',
     marginBottom: 40,
   },
   inputRow: {
@@ -129,19 +131,9 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 10,
   },
-  nextButton: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#333',
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#444',
-  },
   nextButtonPressed: {
     backgroundColor: '#444',
   },
 });
 
-export default HomePage;
+export default YouDidIt;

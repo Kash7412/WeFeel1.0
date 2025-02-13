@@ -1,36 +1,41 @@
 import { useRouter } from "expo-router";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import React from "react";
 
 const HowItWorks = () => {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      {/* Main Content */}
-      <View style={styles.mainContent}>
-        <Text style={styles.title}>Here's how it works</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={{ position: "absolute", top: 10, left: 20 }}>
+        <Text style={styles.subtitle}>
+          here's how it works
+        </Text>
+      </View>
         <View style={styles.content}>
           <Text style={styles.step}>
-            <Text style={styles.stepNumber}>1. </Text>
-            Once a day everyone receives a prompt to film their 10 second{" "}
+            1. Once a day everyone receives a prompt to film their 10 second{" "}
             <Text style={styles.highlight}>WeFeel</Text>
           </Text>
           <Text style={styles.step}>
-            <Text style={styles.stepNumber}>2. </Text>
-            Once you send yours, we’ll send you 5 to watch
+            2. Once you send yours, we’ll send you 5 to watch
           </Text>
+          </View>
+          <View>
           <Text style={styles.summary}>
             That’s 60 seconds of making the world more connected!
           </Text>
-        </View>
-      </View>
+          </View>
 
+        
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.note}>
-          <Text style={styles.noteHighlight}>note:</Text> your videos can be
-          shared. don’t share anything private.
+          <Text style={styles.noteHighlight}>note: your videos can be shared. don’t share anything private.</Text> 
         </Text>
         <Pressable
           onPress={() => router.push("/expectations")}
@@ -39,16 +44,16 @@ const HowItWorks = () => {
           <Text style={styles.nextButtonText}>next</Text>
         </Pressable>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
-    padding: 24,
     alignItems: "center",
+    padding: 24,
+    backgroundColor: "black",
   },
   mainContent: {
     alignItems: "center", // Centers horizontally
@@ -61,17 +66,25 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     textAlign: "center", // Centers the text inside the title
   },
+  subtitle: {
+    fontFamily: "Hind_700",
+    fontSize: 40,
+    color: "#ffffff",
+    lineHeight: 36,
+    marginTop: 20,
+  },
   content: {
-    maxWidth: 300, // Restricts content width for readability
+    maxWidth: 300,
+    marginTop: 110, // Restricts content width for readability
     alignItems: "center", // Centers child text horizontally
   },
   step: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: "Hind_700",
     color: "white",
     marginBottom: 20,
-    lineHeight: 28,
-    textAlign: "center", // Centers each step
+    lineHeight: 30,
+    textAlign: "left", // Centers each step
   },
   stepNumber: {
     fontFamily: "Hind_700Bold",
@@ -83,11 +96,11 @@ const styles = StyleSheet.create({
     color: "white",
   },
   summary: {
-    fontSize: 20,
+    fontSize: 30,
     fontFamily: "Hind_700",
     color: "white",
     marginBottom: 40,
-    textAlign: "center",
+    textAlign: "left",
   },
   footer: {
     width: "100%",
@@ -99,17 +112,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   note: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Hind_700",
     color: "white",
     textAlign: "center",
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 10,
+    lineHeight: 22,
   },
   noteHighlight: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: "Hind_700Bold",
-    color: "red",
+    color: "#C65D3B",
   },
   nextButton: {
     backgroundColor: "white",
@@ -119,6 +133,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     width: "80%",
     maxWidth: 300,
+    marginBottom: 27,
   },
   nextButtonText: {
     fontSize: 18,
