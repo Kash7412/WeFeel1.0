@@ -36,9 +36,9 @@ const RecordFirstWeFeel = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Give camera and microphone access</Text>
+        <Text style={styles.footerText}>give camera and microphone access</Text>
         <Pressable style={styles.readyButton} onPress={handleReadyPress}>
-          <Text style={styles.readyButtonText}>I’m Ready</Text>
+          <Text style={styles.readyButtonText}>i’m ready</Text>
         </Pressable>
       </View>
     </View>
@@ -49,11 +49,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    padding: 24,
+    padding: 18,
     alignItems: "center",
   },
   header: {
-    marginTop: 20,
     alignItems: "center",
   },
   stepIndicator: {
@@ -61,12 +60,19 @@ const styles = StyleSheet.create({
     fontFamily: "Hind_700Bold",
     color: "white",
   },
+  subtitle: {
+    fontFamily: 'Hind_700',
+    fontSize: 38,
+    color: '#ffffff',
+    lineHeight: 48,
+  },
   title: {
-    fontSize: 32,
+    fontSize: 38,
     fontFamily: "Gluten_700Bold",
     color: "white",
     textAlign: "center",
-    marginTop: 10,
+    marginTop: 5,
+    marginBottom: 20,
   },
   promptContainer: {
     alignItems: "center",
@@ -83,7 +89,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 250,
     backgroundColor: "#1E1E1E",
-    borderRadius: 20,
+    borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -107,15 +113,15 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30,
     alignItems: "center",
     width: "100%",
   },
   footerText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: "Hind_700",
     color: "white",
-    marginBottom: 20,
+    marginBottom: 8,
     textAlign: "center",
   },
   readyButton: {
@@ -131,9 +137,10 @@ const styles = StyleSheet.create({
     color: "black",
   },
   image: {
-    width: 400,
-    height: 500,
+    width: 405,
+    height: 495,
     borderRadius: 10,
+    resizeMode: 'contain',
   },
   settingsButton: {
     padding: 10,

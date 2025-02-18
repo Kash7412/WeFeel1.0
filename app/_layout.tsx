@@ -130,7 +130,7 @@ const RootLayout = () => {
           },
           headerTintColor: "white", // Set header title color to white
         }}
-      />
+    />
       <Stack.Screen
         name="record"
         options={{
@@ -199,6 +199,27 @@ const RootLayout = () => {
             backgroundColor: "black", // Set header background to black
           },
           headerTintColor: "white", // Set header title color to white
+        }}
+      />
+        <Stack.Screen  
+        name="youdidit"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+        />
+        <Stack.Screen
+        name="share"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+        />
+        <Stack.Screen
+        name="playback"
+        options={{
+          headerShown: false,
+          headerTitle: "",
         }}
       />
     </Stack>

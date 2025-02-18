@@ -1,15 +1,22 @@
 import { useRouter } from "expo-router";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import React from "react";
 
 const Expectations = () => {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      {/* Main Content */}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <View style={{ position: "absolute", top: 10, left: 20 }}>
+        <Text style={styles.subtitle}>
+          here's how it works
+        </Text>
+      </View>
       <View style={styles.mainContent}>
-        <Text style={styles.title}>What to expect / how to behave</Text>
         <View style={styles.content}>
           <Text style={styles.step}>
             📷 <Text style={styles.highlight}>interesting stories</Text> from
@@ -38,20 +45,20 @@ const Expectations = () => {
           <Text style={styles.nextButtonText}>next</Text>
         </Pressable>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
-    padding: 24,
     alignItems: "center",
+    padding: 24,
+    backgroundColor: "black",
   },
   mainContent: {
     alignItems: "center", // Centers horizontally
-    marginTop: 20, // Adds spacing from the top of the screen
+    marginTop: 140, // Adds spacing from the top of the screen
   },
   title: {
     fontSize: 32,
@@ -59,6 +66,13 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 30,
     textAlign: "center", // Centers the text inside the title
+  },
+  subtitle: {
+    fontFamily: "Hind_700",
+    fontSize: 40,
+    color: "#ffffff",
+    lineHeight: 36,
+    marginTop: 20,
   },
   content: {
     maxWidth: 300, // Restricts content width for readability
@@ -68,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontFamily: "Hind_700",
     color: "white",
-    marginBottom: 60,
+    marginBottom: 30,
     lineHeight: 28,
     textAlign: "center", // Centers each step
   },
@@ -91,19 +105,22 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    height: 100,
     marginBottom: 10, // Space between the warning and the moderation text
   },
   warningText: {
-    fontSize: 16,
-    fontFamily: "Hind_700",
-    color: "black",
+    marginTop: 16,
+    fontSize: 20,
+    fontFamily: "Hind_700Bold",
+    color: "white",
     textAlign: "center",
+    lineHeight: 25,
   },
   moderationText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Hind_700",
     color: "white",
-    marginBottom: 20, // Space between moderation text and the next button
+    marginBottom: 50, // Space between moderation text and the next button
     textAlign: "center",
   },
   nextButton: {
@@ -114,6 +131,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     width: "80%",
     maxWidth: 300,
+    marginBottom: 25,
   },
   nextButtonText: {
     fontSize: 18,

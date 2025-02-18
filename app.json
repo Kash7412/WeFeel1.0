@@ -27,14 +27,7 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow $WeFeel to access your camera",
-          "microphonePermission": "Allow $WeFeel to access your microphone",
-          "recordAudioAndroid": true
-        }
-      ],
+      "expo-camera",
       "expo-video"
     ]
   }
