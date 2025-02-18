@@ -13,11 +13,18 @@ const RecordFirstWeFeel = () => {
     router.push("/record"); // Navigate to permissions page
   };
 
+  const handleSettingPress = () => {
+    router.push("/settings");// For Demoing settings
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Time to record your first WeFeel</Text>
+        <Pressable style={styles.settingsButton} onPress={handleSettingPress}>
+          <Text style={styles.settingsButtonText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <View style={styles.container}>
@@ -127,6 +134,14 @@ const styles = StyleSheet.create({
     width: 400,
     height: 500,
     borderRadius: 10,
+  },
+  settingsButton: {
+    padding: 10,
+    marginRight: 20,
+  },
+  settingsButtonText: {// for demoing settings pages
+    fontSize: 24,
+    color: "white",
   },
 });
 

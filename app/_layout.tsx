@@ -138,6 +138,69 @@ const RootLayout = () => {
           headerTitle: "",
         }}
       />
+      <Stack.Screen
+        name="settings"
+        options={{
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "Hind_700Bold",
+                color: "white",
+                fontSize: 20,
+              }}
+            >
+              Settings
+            </Text>
+          ),
+          headerBackTitle: "Home",
+          headerStyle: {
+            backgroundColor: "black", // Set header background to black
+          },
+          headerTintColor: "white", // Set header title color to white
+        }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "Hind_700Bold",
+                color: "white",
+                fontSize: 20,
+              }}
+            >
+              Profile
+            </Text>
+          ),
+          headerBackTitle: "Settings",
+          headerStyle: {
+            backgroundColor: "black", // Set header background to black
+          },
+          headerTintColor: "white", // Set header title color to white
+        }}
+      />
+      <Stack.Screen
+        name="dangerzone"
+        options={{
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "Hind_700Bold",
+                color: "white",
+                fontSize: 20,
+              }}
+            >
+              Danger Zone
+            </Text>
+          ),
+          headerBackTitle: "Settings",
+          headerStyle: {
+            backgroundColor: "black", // Set header background to black
+          },
+          headerTintColor: "white", // Set header title color to white
+        }}
+      />
     </Stack>
   );
 };
