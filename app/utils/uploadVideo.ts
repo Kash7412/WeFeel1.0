@@ -1,10 +1,9 @@
 import { supabase } from "./supabase";
 import * as FileSystem from "expo-file-system";
 import { Alert } from "react-native";
-global.Buffer = require('buffer').Buffer;
 
 // Function to upload video to Supabase
-export async function uploadVideoToSupabase(videoUri: string) {
+const uploadVideoToSupaBase = async (videoUri: string) => {
   try {
     if (!videoUri) {
       Alert.alert("Error", "No video file found.");
@@ -24,7 +23,7 @@ export async function uploadVideoToSupabase(videoUri: string) {
 
     // Upload the file to Supabase Storage
     const { data, error } = await supabase.storage
-      .from("wefeel-videos") // Make sure your Supabase bucket is named "videos"
+      .from("videos") // Make sure your Supabase bucket is named "videos"
       .upload(fileName, fileBuffer, {
         contentType: "video/mp4",
       });
@@ -42,8 +41,10 @@ export async function uploadVideoToSupabase(videoUri: string) {
 
     return publicUrlData.publicUrl; // Return the public URL of the uploaded video
   } catch (error) {
-    console.error("Error uploading video:", (error as any).stack);
+    console.error("Error uploading video:", error);
     Alert.alert("Upload Error", "Something went wrong.");
     return null;
   }
-}
+};
+
+export { uploadVideoToSupaBase };

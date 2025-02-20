@@ -1,5 +1,5 @@
 import { useEvent } from "expo";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useVideoPlayer, VideoView } from "expo-video";
 import {
   View,
@@ -11,10 +11,17 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {uploadVideoToSupabase} from "../utils/uploadVideo";
 
 export default function Playback() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const videoUri = useMemo(()=> {
+      return Array.isArray(params.uri) ? params.uri[0] : params.uri
+  }, [
+    router
+  ]
+  );
 
   const player = useVideoPlayer(
     Array.isArray(params.uri) ? params.uri[0] : params.uri,
@@ -74,7 +81,12 @@ export default function Playback() {
         {/* Next Button */}
         <Pressable
           style={styles.nextButton}
-          onPress={() => router.push("/youdidit")}
+          
+          onPress={() => {
+            uploadVideoToSupabase(videoUri)
+            router.push("/youdidit")
+          }
+          }
         >
           <Text style={styles.nextButtonText}>send</Text>
         </Pressable>
