@@ -27,7 +27,7 @@ const RootLayout = () => {
         }}
       />
       <Stack.Screen
-        name="code"
+        name="Login/code"
         options={{
           headerTitle: () => (
             <Text
@@ -42,13 +42,13 @@ const RootLayout = () => {
           ),
           headerBackTitle: "Start",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
-        name="explainer"
+        name="Login/explainer"
         options={{
           headerTitle: () => (
             <Text
@@ -63,13 +63,13 @@ const RootLayout = () => {
           ),
           headerBackTitle: "2/5",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
-        name="expectations"
+        name="Login/expectations"
         options={{
           headerTitle: () => (
             <Text
@@ -84,13 +84,13 @@ const RootLayout = () => {
           ),
           headerBackTitle: "3/5",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
-        name="login5"
+        name="Login/login5"
         options={{
           headerTitle: () => (
             <Text
@@ -105,13 +105,13 @@ const RootLayout = () => {
           ),
           headerBackTitle: "4/5",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
-        name="name"
+        name="Login/name"
         options={{
           headerTitle: () => (
             <Text
@@ -126,20 +126,20 @@ const RootLayout = () => {
           ),
           headerBackTitle: "1/5",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
-    />
+      />
       <Stack.Screen
-        name="record"
+        name="videoFeatures/record"
         options={{
           headerShown: false,
           headerTitle: "",
         }}
       />
       <Stack.Screen
-        name="settings"
+        name="admin/settings"
         options={{
           headerTitle: () => (
             <Text
@@ -154,13 +154,13 @@ const RootLayout = () => {
           ),
           headerBackTitle: "Home",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
-        name="profile"
+        name="admin/profile"
         options={{
           headerTitle: () => (
             <Text
@@ -175,9 +175,9 @@ const RootLayout = () => {
           ),
           headerBackTitle: "Settings",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
       <Stack.Screen
@@ -196,27 +196,34 @@ const RootLayout = () => {
           ),
           headerBackTitle: "Settings",
           headerStyle: {
-            backgroundColor: "black", // Set header background to black
+            backgroundColor: "black",
           },
-          headerTintColor: "white", // Set header title color to white
+          headerTintColor: "white",
         }}
       />
-        <Stack.Screen  
-        name="youdidit"
+      <Stack.Screen
+        name="videoFeatures/youdidit"
         options={{
           headerShown: false,
           headerTitle: "",
         }}
-        />
-        <Stack.Screen
-        name="share"
+      />
+      <Stack.Screen
+        name="videoFeatures/share"
         options={{
           headerShown: false,
           headerTitle: "",
         }}
-        />
-        <Stack.Screen
-        name="playback"
+      />
+      <Stack.Screen
+        name="videoFeatures/playback"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="videoFeatures/Feed"
         options={{
           headerShown: false,
           headerTitle: "",

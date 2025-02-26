@@ -38,7 +38,7 @@ const HowItWorks = () => {
           <Text style={styles.noteHighlight}>note: your videos can be shared. don’t share anything private.</Text> 
         </Text>
         <Pressable
-          onPress={() => router.push("/expectations")}
+          onPress={() => router.push("/Login/expectations")}
           style={styles.nextButton}
         >
           <Text style={styles.nextButtonText}>next</Text>

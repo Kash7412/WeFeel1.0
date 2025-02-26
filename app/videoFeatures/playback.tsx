@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {uploadVideoToSupabase} from "../utils/uploadVideo";
+import {uploadVideoToSupabase} from "../../utils/uploadVideo";
 
 export default function Playback() {
   const params = useLocalSearchParams();
@@ -84,7 +84,7 @@ export default function Playback() {
           
           onPress={() => {
             uploadVideoToSupabase(videoUri)
-            router.push("/youdidit")
+            router.push("/videoFeatures/youdidit")
           }
           }
         >

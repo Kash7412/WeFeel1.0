@@ -8,7 +8,7 @@ const HomePage = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const handleNext = () => {
     if (phoneNumber.length > 0) {
-      router.push('/code');
+      router.push('/Login/code');
     }
   };
   return (
@@ -43,7 +43,7 @@ const HomePage = () => {
                 styles.nextButton,
                 pressed && styles.nextButtonPressed
               ]}
-              onPress={() => router.push('/code')}
+              onPress={() => router.push('/Login/code')}
             >
               <AntDesign name="arrowright" size={24} color="white" />
             </Pressable>

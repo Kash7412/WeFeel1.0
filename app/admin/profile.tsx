@@ -1,33 +1,33 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { FC } from "react";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
 
-const DangerZone = () => {
+const Profile: FC = () => {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.header}>Danger Zone</Text>
+      <Text style={styles.header}>Profile</Text>
 
-      {/* Options */}
-      <Pressable style={styles.option} onPress={() => console.log("Log out")}>
-        <Text style={styles.optionText}>
-          <Text style={styles.dangerText}>Log Out</Text>
-        </Text>
-      </Pressable>
+      {/* Name Section */}
+      <View style={styles.section}>
+        <Text style={styles.label}>Name</Text>
+        <View style={styles.valueContainer}>
+          <Text style={styles.value}>John Doe</Text> {/* Placeholder value */}
+        </View>
+      </View>
 
-      <Pressable style={styles.option} onPress={() => console.log("Archive posts")}>
-        <Text style={styles.optionText}>
-          <Text style={styles.warningText}>Archive Posts</Text>
-        </Text>
-      </Pressable>
-
-      <Pressable style={styles.option} onPress={() => console.log("Delete account")}>
-        <Text style={styles.optionText}>
-          <Text style={styles.dangerText}>Delete Account</Text>
-        </Text>
-      </Pressable>
+      {/* Profile Picture Section */}
+      <View style={styles.section}>
+        <Text style={styles.label}>Profile Picture</Text>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: "https://via.placeholder.com/150" }}
+            style={styles.image}
+          />
+        </View>
+      </View>
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     paddingTop: 80, // Moves content higher up
     paddingHorizontal: 24,
-    justifyContent: "flex-start",
+    alignItems: "center",
   },
   header: {
     color: "white",
@@ -57,24 +57,40 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 30,
   },
-  option: {
-    borderBottomColor: "#444", // Subtle divider between options
-    borderBottomWidth: 1,
-    paddingVertical: 15,
-    marginBottom: 10,
+  section: {
+    width: "100%",
+    marginBottom: 20,
     alignItems: "center",
   },
-  optionText: {
+  label: {
     color: "white",
-    fontSize: 20,
+    fontSize: 18,
+    fontFamily: "Hind_700",
+    marginBottom: 10,
+  },
+  valueContainer: {
+    width: "90%",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: "#444",
+    alignItems: "center",
+  },
+  value: {
+    color: "white",
+    fontSize: 18,
     fontFamily: "Hind_700",
     textAlign: "center",
   },
-  dangerText: {
-    color: "#C65D3B", // Red for critical actions
+  imageContainer: {
+    borderWidth: 2,
+    borderColor: "#444",
+    borderRadius: 80,
+    padding: 5,
   },
-  warningText: {
-    color: "#FFA500", // Orange for less severe actions
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
   },
   footer: {
     alignItems: "center",
@@ -95,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DangerZone;
+export default Profile;
