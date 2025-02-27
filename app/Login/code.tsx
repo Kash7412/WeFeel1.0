@@ -27,7 +27,7 @@ const Code = () => {
   };
 
   const handleEnterPress = () => {
-    router.push("/explainer");
+    router.push("/Login/explainer");
   };
 
   return (
@@ -57,7 +57,7 @@ const Code = () => {
             styles.nextButton,
             pressed && styles.nextButtonPressed,
           ]}
-          onPress={() => router.push('/name')}
+          onPress={() => router.push('/Login/name')}
         >
           <AntDesign name="arrowright" size={24} color="white" />
         </Pressable>

@@ -39,7 +39,7 @@ const Expectations = () => {
           humans and AI moderate all videos before sharing.
         </Text>
         <Pressable
-          onPress={() => router.push("/login5")}
+          onPress={() => router.push("/Login/login5")}
           style={styles.nextButton}
         >
           <Text style={styles.nextButtonText}>next</Text>

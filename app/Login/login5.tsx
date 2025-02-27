@@ -10,11 +10,11 @@ const RecordFirstWeFeel = () => {
   };
 
   const handleReadyPress = () => {
-    router.push("/record"); // Navigate to permissions page
+    router.push("/videoFeatures/record"); // Navigate to permissions page
   };
 
   const handleSettingPress = () => {
-    router.push("/settings");// For Demoing settings
+    router.push("/admin/settings");// For Demoing settings
   };
 
   return (
@@ -29,7 +29,7 @@ const RecordFirstWeFeel = () => {
 
       <View style={styles.container}>
         <Image
-          source={require("../assets/login5image.png")}
+          source={require("../../assets/login5image.png")}
           style={styles.image}
         />
       </View>
