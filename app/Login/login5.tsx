@@ -10,19 +10,26 @@ const RecordFirstWeFeel = () => {
   };
 
   const handleReadyPress = () => {
-    router.push("/record"); // Navigate to permissions page
+    router.push("/videoFeatures/record"); // Navigate to permissions page
+  };
+
+  const handleSettingPress = () => {
+    router.push("/admin/settings");// For Demoing settings
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.subtitle}>time to record your first <Text style={styles.title}>WeFeel</Text></Text>
+        <Text style={styles.title}>Time to record your first WeFeel</Text>
+        <Pressable style={styles.settingsButton} onPress={handleSettingPress}>
+          <Text style={styles.settingsButtonText}>⚙️</Text>
+        </Pressable>
       </View>
 
       <View style={styles.container}>
         <Image
-          source={require("../assets/login5image.png")}
+          source={require("../../assets/login5image.png")}
           style={styles.image}
         />
       </View>
@@ -134,6 +141,14 @@ const styles = StyleSheet.create({
     height: 495,
     borderRadius: 10,
     resizeMode: 'contain',
+  },
+  settingsButton: {
+    padding: 10,
+    marginRight: 20,
+  },
+  settingsButtonText: {// for demoing settings pages
+    fontSize: 24,
+    color: "white",
   },
 });
 

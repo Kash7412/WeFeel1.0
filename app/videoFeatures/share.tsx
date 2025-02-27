@@ -36,28 +36,28 @@ const ShareMedia = () => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>spread the word</Text>
-          <Image source={require("../assets/share2.png")} style={styles.image} />
+          <Image source={require("../../assets/share2.png")} style={styles.image} />
         </View>
 
         {/* Social Media Icons */}
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => shareToPlatform("Instagram")}>
-            <Image source={require("../assets/insta.png")} style={styles.shareIcon} />
+            <Image source={require("../../assets/insta.png")} style={styles.shareIcon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => shareToPlatform("WhatsApp")}>
-            <Image source={require("../assets/whatsapp.png")} style={styles.shareIcon} />
+            <Image source={require("../../assets/whatsapp.png")} style={styles.shareIcon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => shareToPlatform("Messages")}>
-            <Image source={require("../assets/sms.png")} style={styles.shareIcon} />
+            <Image source={require("../../assets/sms.png")} style={styles.shareIcon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => shareToPlatform("Recent")}>
-            <Image source={require("../assets/recents2.png")} style={styles.shareIcon} />
+            <Image source={require("../../assets/recents2.png")} style={styles.shareIcon} />
           </TouchableOpacity>
         </View>
 
         {/* Done Button */}
         <View style={styles.footer}>
-          <Pressable style={styles.readyButton} onPress={() => router.push("/")}> 
+          <Pressable style={styles.readyButton} onPress={() => router.push("/videoFeatures/Feed")}> 
             <Text style={styles.readyButtonText}>done</Text>
           </Pressable>
         </View>

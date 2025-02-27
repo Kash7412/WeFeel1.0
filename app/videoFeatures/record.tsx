@@ -70,7 +70,7 @@ const Record = () => {
     setIsCountdownActive(true);
     setCountdown(5); // Reset countdown when "start" is pressed
     if (cam && cam.recordAsync) {
-        setVideoUriPromise(cam.recordAsync({}));
+        setVideoUriPromise(cam.recordAsync());
     } else {
         console.error("Camera is not initialized or does not have recordAsync method");
     }
@@ -106,7 +106,7 @@ const Record = () => {
                 style={styles.flipButton}
                 onPress={toggleCameraFacing}
               >
-                <Text style={styles.flipButtonText}>flip camera</Text>
+                <Text style={styles.flipButtonText}>Flip Camera</Text>
               </TouchableOpacity>
             </View>
           </CameraView>
