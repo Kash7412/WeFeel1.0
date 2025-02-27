@@ -58,7 +58,7 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Report a Bug / Make a Suggestion</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => handleNavigation("/app-store-review")}>
+        <Pressable style={styles.option} onPress={() => handleNavigation("/videoFeatures/Home")}>
           <Text style={styles.optionText}>Review Us in the App Store</Text>
         </Pressable>
 

@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { useFonts, Gluten_700Bold } from "@expo-google-fonts/gluten";
 import { Hind_700Bold } from "@expo-google-fonts/hind";
+import { RedHatDisplay_400Regular } from "@expo-google-fonts/red-hat-display";
 import AppLoading from "expo-app-loading";
 import { View, Text, useColorScheme } from "react-native";
 import React from "react";
@@ -9,6 +10,7 @@ const RootLayout = () => {
   const [fontsLoaded] = useFonts({
     Gluten_700Bold,
     Hind_700Bold,
+    RedHatDisplay_400Regular,
   });
 
   const colorScheme = useColorScheme();
@@ -21,6 +23,13 @@ const RootLayout = () => {
     <Stack>
       <Stack.Screen
         name="index"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="videoFeatures/Home"
         options={{
           headerShown: false,
           headerTitle: "",
