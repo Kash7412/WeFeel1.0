@@ -24,7 +24,7 @@ export async function uploadVideoToSupabase(videoUri: string) {
 
     // Upload the file to Supabase Storage
     const { data, error } = await supabase.storage
-      .from("wefeel-videos") // Make sure your Supabase bucket is named "videos"
+      .from("wefeel-videos") 
       .upload(fileName, fileBuffer, {
         contentType: "video/mp4",
       });
