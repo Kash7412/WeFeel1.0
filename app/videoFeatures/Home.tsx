@@ -24,7 +24,7 @@ const Home: FC = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity 
-          onPress={() => handleNavigation('/admin/profile')}
+          onPress={() => handleNavigation('/admin/settings')}
           style={{ flexDirection: 'row', alignItems: 'center' }}
         >
           <Image 

@@ -5,9 +5,10 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Alert
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { supabase } from "../../utils/supabase"; // Import Supabase instance
 
 const Settings: FC = () => {
   const router = useRouter();
@@ -18,29 +19,38 @@ const Settings: FC = () => {
 
   const handleDeleteAccount = (): void => {
     Alert.alert(
-        "Delete Account",
-        "Are you sure you want to delete your account? This action cannot be undone.",
-        [
-            {
-                text: "Cancel",
-                style: "cancel"
-            },
-            {
-                text: "Delete",
-                onPress: () => console.log("Delete Account"), // Add actual delete logic here
-                style: "destructive"
-            }
-        ]
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            console.log("Delete Account"); // TODO: Implement actual delete logic
+          },
+          style: "destructive",
+        },
+      ]
     );
   };
 
-  const handleLogout = (): void => {
-      // TODO: Implement the actual logout functionality here
-      console.log("Placeholder for logout logic");
-      Alert.alert("Logged Out", "You have been successfully logged out.", [
-          { text: "OK",
-            onPress: () => console.log("Logout confirmed") }
-      ]);
+  const handleLogout = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        Alert.alert("Logout Failed", error.message);
+        return;
+      }
+
+      // Redirect to index screen after logout
+      router.replace("/");
+    } catch (error) {
+      console.error("Logout Error:", error);
+      Alert.alert("Logout Failed", "Something went wrong.");
+    }
   };
 
   return (
@@ -62,12 +72,14 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Review Us in the App Store</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => handleLogout()}>
+        {/* Logout Button */}
+        <Pressable style={styles.option} onPress={handleLogout}>
           <Text style={styles.optionText}>Log Out</Text>
         </Pressable>
-        
-        <Pressable style={styles.option} onPress={() => handleDeleteAccount()}>
-          <Text style={styles.optionText}>Delete Account</Text>
+
+        {/* Delete Account */}
+        <Pressable style={styles.dangerZone} onPress={handleDeleteAccount}>
+          <Text style={styles.dangerText}>Delete Account</Text>
         </Pressable>
       </ScrollView>
 

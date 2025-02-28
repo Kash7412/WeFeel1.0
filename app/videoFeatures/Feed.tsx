@@ -90,7 +90,7 @@ export default function Feed() {
         {/* Button to go back */}
         <TouchableOpacity
           style={styles.startButton}
-          onPress={() => router.back()}
+          onPress={() => router.push("/videoFeatures/record")}
         >
           <Text style={styles.startButtonText}>back</Text>
         </TouchableOpacity>

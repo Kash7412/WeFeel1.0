@@ -14,7 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wefeel.firstapp", 
+      "config": {
+        "usesAppleSignIn": true
+      }
     },
     "android": {
       "adaptiveIcon": {
