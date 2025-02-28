@@ -3,17 +3,19 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
+  Dimensions,
   FlatList,
-  ActivityIndicator,
+  ImageBackground,
+  TouchableOpacity,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useRouter } from "expo-router";
 import { supabase } from "../../utils/supabase";
 
+const { width, height } = Dimensions.get("window");
+
 export default function Feed() {
-  const [videos, setVideos] = useState<string[]>([]);
+  const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -21,10 +23,8 @@ export default function Feed() {
     fetchVideos();
   }, []);
 
-  // Function to fetch video URLs from Supabase (Private Bucket with Signed URLs)
   const fetchVideos = async () => {
     try {
-      console.log("Fetching video list...");
       const { data, error } = await supabase.storage
         .from("wefeel-videos")
         .list("videos", { limit: 10 });
@@ -34,28 +34,24 @@ export default function Feed() {
         return;
       }
 
-      console.log("Files found:", data);
-
-      // Generate signed URLs for each video (valid for 1 hour)
       const signedUrls = await Promise.all(
         data.map(async (file) => {
           const { data, error } = await supabase.storage
             .from("wefeel-videos")
-            .createSignedUrl(`videos/${file.name}`, 3600); // Ensure correct subfolder path
+            .createSignedUrl(`videos/${file.name}`, 3600);
 
           if (error) {
             console.error("Error generating signed URL:", error.message);
             return null;
           }
 
-          return data.signedUrl; // Return the signed URL
+          return data.signedUrl;
         })
       );
 
-      const filteredUrls = signedUrls.filter((url) => url !== null);
+      const filteredUrls = signedUrls.filter(url => url !== null);
       setVideos(filteredUrls);
       setLoading(false);
-      console.log("Fetched Signed Video URLs:", filteredUrls);
     } catch (error) {
       console.error("Error fetching videos:", error);
     }
@@ -63,44 +59,26 @@ export default function Feed() {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{
-          uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background",
-        }}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.header}>
-          <Text style={styles.subtitle}>watch the</Text>
-          <Text style={styles.title}>wefeel feed</Text>
-        </View>
-
-        {loading ? (
-          <ActivityIndicator size="large" color="white" />
-        ) : videos.length === 0 ? (
-          <Text style={styles.noVideosText}>No videos available</Text>
-        ) : (
-          <FlatList
-            data={videos}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => <VideoCard videoUrl={item} />}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-
-        {/* Button to go back */}
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.startButtonText}>back</Text>
-        </TouchableOpacity>
-      </ImageBackground>
+      {loading ? (
+        <Text style={styles.loadingText}>Loading...</Text>
+      ) : (
+        <FlatList
+          data={videos}
+          horizontal={false}
+          pagingEnabled
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <VideoCard videoUrl={item} />
+          )}
+          style={{ width }}
+        />
+      )}
     </View>
   );
 }
 
-// Component to display each video in the feed
-const VideoCard = ({ videoUrl }: { videoUrl: string }) => {
+const VideoCard = ({ videoUrl }) => {
   const player = useVideoPlayer(videoUrl, (player) => {
     player.loop = true;
     player.play();
@@ -114,6 +92,7 @@ const VideoCard = ({ videoUrl }: { videoUrl: string }) => {
         allowsFullscreen
         allowsPictureInPicture
       />
+      <View style={styles.frame} />
     </View>
   );
 };
@@ -123,56 +102,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "black",
   },
-  backgroundImage: {
-    flex: 1,
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-  header: {
-    marginTop: 120,
-    paddingHorizontal: 10,
-  },
-  subtitle: {
-    fontFamily: "Hind_700",
-    fontSize: 38,
-    color: "#ffffff",
-    lineHeight: 48,
-  },
-  title: {
-    fontSize: 38,
-    fontFamily: "Gluten_700Bold",
-    color: "white",
-    textAlign: "center",
-    marginTop: 5,
-    marginBottom: 10,
-  },
-  noVideosText: {
-    fontSize: 18,
-    color: "white",
-    textAlign: "center",
-    marginTop: 20,
-  },
   videoContainer: {
-    width: 350,
-    height: 400,
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 20,
+    width: width,
+    height: height, // Full screen height for each video
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: 'hidden', // Ensures the video is clipped to the frame shape
   },
   video: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
   },
-  startButton: {
-    backgroundColor: "white",
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 60,
-    marginBottom: 50,
+  frame: {
+    position: 'absolute',
+    top: '15%', // Position to vertically center the frame
+    left: '10%', // Position to horizontally center the frame
+    width: '80%', // Width of the visible frame area
+    height: '70%', // Height of the visible frame area
+    borderRadius: 20, // Rounded corners for the frame
+    borderWidth: 10, // Border width to create frame effect
+    borderColor: 'white', // Frame color
+    backgroundColor: 'transparent', // Ensure the frame does not block the video
   },
-  startButtonText: {
+  loadingText: {
+    color: "white",
     fontSize: 20,
-    fontFamily: "Gluten_700Bold",
-    color: "black",
+    textAlign: "center",
+    marginTop: height / 2 - 10,
   },
 });

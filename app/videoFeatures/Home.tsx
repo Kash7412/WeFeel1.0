@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions} from 'react-native';
 import { useRouter } from "expo-router";
 
 
@@ -32,6 +32,15 @@ const Home: FC = () => {
             style={styles.profileImage}
           />
           <Text style={styles.title}>WeFeel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => handleNavigation('/admin/settings')}
+          style={styles.settingsButton}
+        >
+          <Image 
+            source={require("../../assets/settings-25-128.png")} // Ensure the correct path to your settings icon image
+            style={styles.settingsIcon}
+          />
         </TouchableOpacity>
       </View>
 
@@ -232,7 +241,16 @@ const styles = StyleSheet.create({
     width: 50, // Set the width of the image
     height: 50, // Set the height of the image
     borderRadius: 25, // Half of width and height to make it circle
-    marginRight: 10, // Add some spacing between the image and the title
+    marginRight: 30, // Add some spacing between the image and the title
+  },
+  settingsButton: {
+    marginLeft: 35,
+    marginRight: 20  // Space from the right edge of the screen
+  },
+  settingsIcon: {
+    marginLeft: 0,
+    width: 40, // Adjust according to your preference
+    height: 40, // Adjust according to your preference
   },
 });
 
