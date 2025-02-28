@@ -171,22 +171,8 @@ const RootLayout = () => {
       <Stack.Screen
         name="admin/profile"
         options={{
-          headerTitle: () => (
-            <Text
-              style={{
-                fontFamily: "Hind_700Bold",
-                color: "white",
-                fontSize: 20,
-              }}
-            >
-              Profile
-            </Text>
-          ),
-          headerBackTitle: "Settings",
-          headerStyle: {
-            backgroundColor: "black",
-          },
-          headerTintColor: "white",
+          headerShown: false,
+          headerTitle: "",
         }}
       />
       <Stack.Screen
