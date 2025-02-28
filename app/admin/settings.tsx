@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   Pressable,
+  Alert
 } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -13,6 +14,33 @@ const Settings: FC = () => {
 
   const handleNavigation = (path: string) => {
     router.push(path);
+  };
+
+  const handleDeleteAccount = (): void => {
+    Alert.alert(
+        "Delete Account",
+        "Are you sure you want to delete your account? This action cannot be undone.",
+        [
+            {
+                text: "Cancel",
+                style: "cancel"
+            },
+            {
+                text: "Delete",
+                onPress: () => console.log("Delete Account"), // Add actual delete logic here
+                style: "destructive"
+            }
+        ]
+    );
+  };
+
+  const handleLogout = (): void => {
+      // TODO: Implement the actual logout functionality here
+      console.log("Placeholder for logout logic");
+      Alert.alert("Logged Out", "You have been successfully logged out.", [
+          { text: "OK",
+            onPress: () => console.log("Logout confirmed") }
+      ]);
   };
 
   return (
@@ -30,12 +58,16 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Report a Bug / Make a Suggestion</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => handleNavigation("/app-store-review")}>
+        <Pressable style={styles.option} onPress={() => handleNavigation("/videoFeatures/Home")}>
           <Text style={styles.optionText}>Review Us in the App Store</Text>
         </Pressable>
 
-        <Pressable style={styles.dangerZone} onPress={() => handleNavigation("/dangerzone")}>
-          <Text style={styles.dangerText}>Danger Zone</Text>
+        <Pressable style={styles.option} onPress={() => handleLogout()}>
+          <Text style={styles.optionText}>Log Out</Text>
+        </Pressable>
+        
+        <Pressable style={styles.option} onPress={() => handleDeleteAccount()}>
+          <Text style={styles.optionText}>Delete Account</Text>
         </Pressable>
       </ScrollView>
 
