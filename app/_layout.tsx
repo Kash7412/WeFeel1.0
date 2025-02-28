@@ -22,7 +22,7 @@ const RootLayout = () => {
   return (
     <Stack>
       <Stack.Screen
-        name="Login/SignUp"
+        name="index"
         options={{
           headerShown: false,
           headerTitle: "",
