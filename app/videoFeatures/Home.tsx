@@ -152,7 +152,7 @@ const Home: FC = () => {
           </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} accessible accessibilityLabel="Start collecting">
-          <Text style={[styles.cardText, {marginTop: 200, fontSize: 48}]}>What's your moonshot? </Text>
+          <Text style={[styles.cardText, {marginTop: 200, fontSize: 48}]}>Share a video of something that made you smile! </Text>
         </TouchableOpacity>
         </View>
 
