@@ -22,9 +22,6 @@ const RecordFirstWeFeel = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Time to record your first WeFeel</Text>
-        <Pressable style={styles.settingsButton} onPress={handleSettingPress}>
-          <Text style={styles.settingsButtonText}>⚙️</Text>
-        </Pressable>
       </View>
 
       <View style={styles.container}>
