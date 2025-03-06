@@ -81,12 +81,10 @@ export default function Playback() {
         {/* Next Button */}
         <Pressable
           style={styles.nextButton}
-          
-          onPress={() => {
-            uploadVideoToSupabase(videoUri)
-            router.push("/videoFeatures/youdidit")
-          }
-          }
+          onPress={async () => {
+            await uploadVideoToSupabase(videoUri);
+            router.push("/videoFeatures/youdidit");
+          }}
         >
           <Text style={styles.nextButtonText}>send</Text>
         </Pressable>
