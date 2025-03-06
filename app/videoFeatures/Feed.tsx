@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
+  Pressable,
   Image
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -93,6 +94,7 @@ export default function Feed() {
 
 
 
+
   return (
     <ImageBackground
       source={{ uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background" }}
@@ -107,7 +109,11 @@ export default function Feed() {
           horizontal={false}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
-            <VideoCard videoUrl={item} isActive={index === currentIndex} />
+            <VideoCard videoUrl={item}
+             isActive={index === currentIndex}
+             isLast={index === videos.length - 1}
+             index={index}
+             />
           )}
           style={{ marginVertical: 0, padding: 0 }}
           showsVerticalScrollIndicator={false}
@@ -129,8 +135,17 @@ export default function Feed() {
   );
 }
 
-const VideoCard = ({ videoUrl, isActive }) => {
+interface VideoCardProps {
+  videoUrl: string;
+  isActive: boolean;
+  isLast: boolean; // Type for the new prop
+  index: number;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({ videoUrl, isActive, isLast, index }) => {
   const player = useVideoPlayer(videoUrl);
+  const router = useRouter(); // Ensure the router is available
+
 
   useEffect(() => {
     if (isActive) {
@@ -141,6 +156,10 @@ const VideoCard = ({ videoUrl, isActive }) => {
     }
   }, [isActive]);
 
+  const navigateHome = () => {
+    router.navigate('/videoFeatures/Home'); // Modify according to your actual home route
+  };
+
   return (
     <View style={styles.videoContainer}>
         <VideoView
@@ -149,6 +168,15 @@ const VideoCard = ({ videoUrl, isActive }) => {
           allowsFullscreen
           allowsPictureInPicture
         />
+      <Pressable
+        style={styles.backToHomeButton}
+        onPress={navigateHome}
+        disabled={!isLast} // Disable the button action if not the last video
+      >
+        <Text style={styles.buttonText}>
+          {isLast ? "Go to Home" : `${index + 1}/${6}`}
+        </Text>
+      </Pressable>
     </View>
   );
 };
@@ -235,5 +263,16 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
     color: 'white'
+  },
+  backToHomeButton: {
+    justifyContent: 'center',
+    bottom: 150, // Positioned at the bottom of the video
+    backgroundColor: 'white', // Button color
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'black', // Text color
+    fontWeight: 'bold',
   },
 });
