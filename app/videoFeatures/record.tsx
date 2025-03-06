@@ -36,7 +36,7 @@ const Record = () => {
       videoUriPromise
         ?.then(({ uri }) => {
           console.log(uri);
-          router.push({ pathname: `/playback`, params: { uri: uri } });
+          router.push({ pathname: `/videoFeatures/playback`, params: { uri: uri } });
         })
         .catch((e) => {
           console.log(e);
@@ -115,7 +115,7 @@ const Record = () => {
         {/* Countdown Badge */}
         <View style={styles.badgeContainer}>
           <View style={styles.badge}>
-          <Pressable onPress={() => router.push('/youdidit')}>
+          <Pressable onPress={() => router.push('/videoFeatures/youdidit')}>
               <Text style={styles.badgeText}>
               {countdown > 0 ? countdown : "Done"}
               </Text>
