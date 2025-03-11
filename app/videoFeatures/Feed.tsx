@@ -7,25 +7,27 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
-  Image
+  Alert,
+  Image,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useRouter } from "expo-router";
 import { supabase } from "../../utils/supabase";
+import moment from "moment-timezone"; // Ensure moment.js is installed
 
+const { width, height } = Dimensions.get("window");
 
+// User profile UI
 const UserProfile = () => {
   return (
     <View style={styles.userProfile}>
-      <Image
-        source={require("../../assets/profile.png")} // Ensure the correct path
-        style={styles.profilePic}
-      />
+      <Image source={require("../../assets/profile.png")} style={styles.profilePic} />
       <Text style={styles.username}>User123</Text>
     </View>
   );
 };
 
+// Daily prompt UI
 const DailyPrompt = () => {
   return (
     <View style={styles.promptContainer}>
@@ -39,116 +41,82 @@ export default function Feed() {
   const [videos, setVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0); // Track the current index for manual navigation
-  const flatListRef = useRef(null); // Ref for the FlatList for programmatically scrolling
-  const [activeIndex, setActiveIndex] = useState(null); // Track active video index
-
-  const Width = Dimensions.get('window').width; // Get the screen width
-  const Height = Dimensions.get('window').height; // Get the screen width
-
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     fetchVideos();
   }, []);
 
-  // Function to fetch video URLs from Supabase (Private Bucket with Signed URLs)
-  const fetchVideos = async () => {
+  // Fetches 3 random videos from today's date
+  const fetchVideos = async (retryCount = 0) => {
     try {
-      console.log("Fetching video list...");
-      const { data, error } = await supabase.storage
-        .from("wefeel-videos")
-        .list("videos", { limit: 6 });
-
+      const today = moment().tz("America/Los_Angeles").startOf('day').format("YYYY-MM-DD HH:mm:ss");
+      console.log("📤 Fetching videos for:", today);
+  
+      const { data, error } = await supabase.rpc("get_random_videos", {
+        today_date: today,
+        video_limit: 3
+      });
+  
       if (error) {
-        console.error("Error fetching video list:", error.message);
+        console.error("❌ Error fetching videos from Supabase:", error.message);
         return;
       }
-
-      console.log("Files found:", data);
-
-      // Generate signed URLs for each video (valid for 1 hour)
-      const signedUrls = await Promise.all(
-        data.map(async (file) => {
-          const { data, error } = await supabase.storage
-            .from("wefeel-videos")
-            .createSignedUrl(`videos/${file.name}`, 3600); // Ensure correct subfolder path
-
-          if (error) {
-            console.error("Error generating signed URL:", error.message);
-            return null;
-          }
-
-          return data.signedUrl; // Return the signed URL
-        })
-      );
-
-      const filteredUrls = signedUrls.filter((url) => url !== null);
-      setVideos(filteredUrls);
-      setLoading(false);
-      console.log("Fetched Signed Video URLs:", filteredUrls);
+  
+      console.log("✅ Received videos:", Array.isArray(data[0]) ? data[0] : data);
+      if (Array.isArray(data)) {
+        console.log("✅ Received videos:", data);
+      } else {
+        console.log("🚨 Data is not an array:", data);
+      }
+      console.log("✅ Received videos:", JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error("Error fetching videos:", error);
+      console.error("❌ Error in fetchVideos function:", error);
     }
   };
 
-
-
   return (
-    <ImageBackground
-      source={{ uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background" }}
-      style={styles.backgroundImage}
-    >
+    <ImageBackground source={{ uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background" }} style={styles.backgroundImage}>
       {loading ? (
-        <ActivityIndicator size="large" color="black" />
+        <ActivityIndicator size="large" color="white" />
       ) : (
         <FlatList
           data={videos}
           pagingEnabled
           horizontal={false}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => (
-            <VideoCard videoUrl={item} isActive={index === currentIndex} />
-          )}
-          style={{ marginVertical: 0, padding: 0 }}
+          renderItem={({ item, index }) => <VideoCard videoUrl={item} isActive={index === currentIndex} />}
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={({ viewableItems }) => {
             if (viewableItems.length > 0) {
-              setCurrentIndex(viewableItems[0].index);  // Update the current index to the visible video
+              setCurrentIndex(viewableItems[0].index);
             }
           }}
-          viewabilityConfig={{
-            itemVisiblePercentThreshold: 50  // Adjust as needed
-          }}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         />
       )}
-      <UserProfile /> 
-      <DailyPrompt />  // Add the DailyPrompt component
-
-
+      <UserProfile />
+      <DailyPrompt />
     </ImageBackground>
   );
 }
 
-const VideoCard = ({ videoUrl, isActive }) => {
+const VideoCard = ({ videoUrl, isActive }: { videoUrl: string; isActive: boolean }) => {
   const player = useVideoPlayer(videoUrl);
 
   useEffect(() => {
     if (isActive) {
       player.play();
-      player.loop = true;  // Start playing when the video is active
+      player.loop = true;
     } else {
-      player.pause(); // Ensure the video is paused when not active
+      player.pause();
     }
   }, [isActive]);
 
   return (
     <View style={styles.videoContainer}>
-        <VideoView
-          style={styles.video}
-          player={player}
-          allowsFullscreen
-          allowsPictureInPicture
-        />
+      <VideoView style={styles.video} player={player} allowsFullscreen allowsPictureInPicture />
     </View>
   );
 };
@@ -164,76 +132,65 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: "100%",
-    color: 'black'
   },
   userProfile: {
-    position: 'absolute',
-    top: 100,  // Keep the top padding to maintain vertical positioning
-    left: 20,  // Change from right to left for left-side alignment
-    flexDirection: 'row',  // Elements are side by side
-    alignItems: 'center',  // Align items vertically within the container
+    position: "absolute",
+    top: height * 0.1, 
+    left: width * 0.05, 
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 25,
     padding: 8,
   },
   profilePic: {
-    width: 50,  // Adjust size as needed
-    height: 50,  // Adjust size as needed
-    borderRadius: 25,  // Makes the image round
-    marginRight: 15
+    width: width * 0.13, 
+    height: width * 0.13,
+    borderRadius: (width * 0.13) / 2,
+    marginRight: width * 0.03,
   },
   username: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textShadowColor: 'grey',  // Shadow color that will act as the outline
+    color: "white",
+    fontSize: width * 0.045, 
+    fontWeight: "bold",
+    textShadowColor: "grey",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
     marginBottom: 5,
-  },
-  noVideosText: {
-    fontSize: 18,
-    color: "white",
-    textAlign: "center",
-    marginTop: 20,
   },
   videoContainer: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black', // You can set this to any color that matches the "window frame" color
-    paddingVertical: 0, // Ensure no padding is causing gaps
-    margin: 0, // Ensure no margin is causing gaps
+    width: "100%",
+    height: height * 0.9, 
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
   },
   video: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   promptContainer: {
-    position: 'absolute',
-    top: 100,
-    right: 20,
-    padding: 10,
+    position: "absolute",
+    top: height * 0.1,
+    right: width * 0.05,
+    padding: width * 0.02, 
     borderRadius: 8,
-    maxWidth: '40%',  // Adjust based on your layout needs
+    maxWidth: "40%",
   },
   promptText: {
-    fontWeight: 'bold',
-    fontFamily: 'Gluten_700Bold',
-    fontSize: 32,
-    textShadowColor: 'black',  // Shadow color that will act as the outline
+    fontWeight: "bold",
+    fontSize: width * 0.08, 
+    textShadowColor: "black",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
     marginBottom: 5,
-    color: 'white'
+    color: "white",
   },
   prompt: {
-    fontSize: 21,
-    fontWeight: 'bold',
-    fontFamily: 'Gluten_700Bold',
-    textShadowColor: 'black',
+    fontSize: width * 0.05,
+    fontWeight: "bold",
+    textShadowColor: "black",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
-    color: 'white'
+    color: "white",
   },
 });

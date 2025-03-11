@@ -72,7 +72,7 @@ const Home: FC = () => {
         <View style={[styles.card, { width: cardWidth, padding: 0 }]}>
           {/* Adjust Image component here */}
           <TouchableOpacity 
-            onPress={() => handleNavigation('/videoFeatures/playback')} // Adjust the path according to your router settings
+            onPress={() => handleNavigation('/videoFeatures/record')} // Adjust the path according to your router settings
             style={{ alignItems: 'center', width: '100%', height: '100%' }}
           >
             <Image 
