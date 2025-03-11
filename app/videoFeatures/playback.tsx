@@ -1,57 +1,58 @@
-import { useEvent } from "expo";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useVideoPlayer, VideoView } from "expo-video";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  ActivityIndicator,
   ImageBackground,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {uploadVideoToSupabase} from "../../utils/uploadVideo";
+import { uploadVideoToSupabase } from "../../utils/uploadVideo";
 
 export default function Playback() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const videoUri = useMemo(()=> {
-      return Array.isArray(params.uri) ? params.uri[0] : params.uri
-  }, [
-    router
-  ]
-  );
+  const { width, height } = useWindowDimensions(); // Get screen size
+  const [isUploading, setIsUploading] = useState(false); // State for loading indicator
 
-  const player = useVideoPlayer(
-    Array.isArray(params.uri) ? params.uri[0] : params.uri,
-    (player) => {
-      player.loop = true;
-      player.play();
-    }
-  );
+  const videoUri = useMemo(() => {
+    return Array.isArray(params.uri) ? params.uri[0] : params.uri;
+  }, [params.uri]);
 
-  const { isPlaying } = useEvent(player, "playingChange", {
-    isPlaying: player.playing,
+  const player = useVideoPlayer(videoUri, (player) => {
+    player.loop = true;
+    player.play();
   });
+
+  const handleSend = async () => {
+    setIsUploading(true);
+    player.pause(); // Pause the video when sending
+
+    await uploadVideoToSupabase(videoUri);
+
+    setIsUploading(false);
+    router.push("/videoFeatures/youdidit");
+  };
 
   return (
     <View style={styles.container}>
       <ImageBackground
         source={{
-          uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background", // Replace with your background image
+          uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background",
         }}
         style={styles.backgroundImage}
       >
         {/* Title */}
         <View style={styles.header}>
-        <Text style={styles.subtitle}>watch your</Text>
-        <Text style={styles.title}>masterpiece</Text>
-
+          <Text style={styles.subtitle}>watch your</Text>
+          <Text style={styles.title}>masterpiece</Text>
         </View>
 
         {/* Video Player Container */}
-        <View style={styles.videoContainer}>
+        <View style={[styles.videoContainer, { width: width * 0.9, height: height * 0.45 }]}>
           <VideoView
             style={styles.video}
             player={player}
@@ -60,33 +61,12 @@ export default function Playback() {
           />
         </View>
 
-        {/* Controls */}
-        <View style={styles.controlsContainer}>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => {
-              if (isPlaying) {
-                player.pause();
-              } else {
-                player.play();
-              }
-            }}
-          >
-            <Text style={styles.startButtonText}>
-              {isPlaying ? "Pause" : "Play"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {/* Uploading Spinner */}
+        {isUploading && <ActivityIndicator size="large" color="white" style={styles.loadingSpinner} />}
 
-        {/* Next Button */}
-        <Pressable
-          style={styles.nextButton}
-          onPress={async () => {
-            await uploadVideoToSupabase(videoUri);
-            router.push("/videoFeatures/youdidit");
-          }}
-        >
-          <Text style={styles.nextButtonText}>send</Text>
+        {/* Send Button */}
+        <Pressable style={[styles.nextButton, { width: width * 0.8 }]} onPress={handleSend} disabled={isUploading}>
+          <Text style={styles.nextButtonText}>{isUploading ? "Uploading..." : "Send"}</Text>
         </Pressable>
       </ImageBackground>
     </View>
@@ -105,14 +85,15 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
-    marginTop: 120,
+    marginTop: "15%",
     paddingHorizontal: 10,
+    alignItems: "center",
   },
   subtitle: {
-    fontFamily: 'Hind_700',
-    fontSize: 38,
-    color: '#ffffff',
-    lineHeight: 48,
+    fontFamily: "Hind_700",
+    fontSize: 36,
+    color: "#ffffff",
+    lineHeight: 44,
   },
   title: {
     fontSize: 38,
@@ -123,28 +104,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   videoContainer: {
-    width: 400,
-    height: 400,
     borderRadius: 20,
     overflow: "hidden",
-    marginTop: 1,
   },
   video: {
     flex: 1,
+    width: "100%",
+    height: "100%",
+    borderRadius: 20,
+    objectFit: "cover", // Alternative for resizeMode
   },
-  controlsContainer: {
-    padding: 10,
-  },
-  startButton: {
-    backgroundColor: "white",
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 60,
-  },
-  startButtonText: {
-    fontSize: 15,
-    fontFamily: "Gluten_700Bold",
-    color: "black",
+  loadingSpinner: {
+    marginVertical: 20,
   },
   nextButton: {
     backgroundColor: "white",
@@ -152,9 +123,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 15,
-    width: "80%",
     maxWidth: 300,
-    marginBottom: 50,
+    marginBottom: "8%",
   },
   nextButtonText: {
     fontSize: 22,
