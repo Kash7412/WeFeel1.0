@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   Pressable,
+  useWindowDimensions
 } from "react-native";
 import { useRouter } from "expo-router";
 import Camera, {
@@ -13,25 +14,99 @@ import Camera, {
   CameraType,
   useCameraPermissions,
 } from "expo-camera";
-import type { CameraRecordingOptions } from "expo-camera";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "../../utils/supabase"; // Ensure you have a Supabase client configured
 
 const Record = () => {
+  const { width, height } = useWindowDimensions();
   const [permission, requestPermission] = useCameraPermissions();
   const [countdown, setCountdown] = useState(5);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [cam, setCam] = useState<CameraView>();
   const [videoUriPromise, setVideoUriPromise] = useState<Promise<any>>();
   const router = useRouter();
-
   const [facing, setFacing] = useState<CameraType>("back");
+
+  // State for prompt
+  const [prompt, setPrompt] = useState("Loading prompt...");
+
+  useEffect(() => {
+    fetchPromptOfTheDay();
+  }, []);
+
+  // Fetch Prompt of the Day
+  const fetchPromptOfTheDay = async () => {
+    const today = new Date().toISOString().split("T")[0]; // Get the current date (YYYY-MM-DD)
+  
+    // 1️⃣ Check if there's already a stored prompt for today
+    let { data: existingPrompt, error } = await supabase
+      .from("prompt_of_the_day")
+      .select("prompt_id")
+      .eq("date", today)
+      .single(); // Fetch only one row (today's prompt)
+  
+    if (error && error.code !== "PGRST116") {
+      console.error("Error fetching today's prompt:", error.message);
+      setPrompt("Error loading prompt");
+      return;
+    }
+  
+    // 2️⃣ If a prompt exists, fetch its text from the `prompts` table
+    if (existingPrompt) {
+      let { data: promptData, error: promptError } = await supabase
+        .from("prompts")
+        .select("text")
+        .eq("id", existingPrompt.prompt_id)
+        .single();
+  
+      if (promptError || !promptData) {
+        console.error("Error fetching prompt text:", promptError?.message || "Prompt not found");
+        setPrompt("Error loading prompt");
+        return;
+      }
+  
+      setPrompt(promptData.text ?? "Error loading prompt"); // ✅ Safe null check
+      return; // ✅ Exit function since we already have today's prompt
+    }
+  
+    // 3️⃣ If no prompt exists for today, pick a new one
+    let { data: allPrompts, error: fetchError } = await supabase
+      .from("prompts")
+      .select("id, text");
+  
+    if (fetchError || !allPrompts || allPrompts.length === 0) {
+      console.error("Error fetching prompts:", fetchError?.message || "No prompts found");
+      setPrompt("No prompts available.");
+      return;
+    }
+  
+  // 4️⃣ Select a new prompt using day-based cycling (Fix: Use .getTime() for date subtraction)
+  const startDate = new Date("2025-01-01").getTime(); // Convert to timestamp
+  const todayDate = new Date().getTime(); // Convert current date to timestamp
+
+  const daysSinceStart = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
+
+  const selectedPrompt = allPrompts[daysSinceStart % allPrompts.length];
+  
+    // 5️⃣ Store the new prompt in `prompt_of_the_day`
+    const { error: insertError } = await supabase.from("prompt_of_the_day").insert([
+      { prompt_id: selectedPrompt.id, date: today }
+    ]);
+  
+    if (insertError) {
+      console.error("Error saving new prompt:", insertError.message);
+    }
+  
+    setPrompt(selectedPrompt.text ?? "Error loading prompt"); // ✅ Safe null check
+  };
+  
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isCountdownActive && countdown > 0) {
       timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
-    } else if (countdown == 0 && cam) {
-      console.log("countdown done");
+    } else if (countdown === 0 && cam) {
+      console.log("Countdown done");
       cam.stopRecording();
       videoUriPromise
         ?.then(({ uri }) => {
@@ -43,7 +118,7 @@ const Record = () => {
         });
     }
 
-    return () => clearTimeout(timer); // Cleanup the timer
+    return () => clearTimeout(timer);
   }, [isCountdownActive, countdown, cam]);
 
   if (!permission) {
@@ -53,13 +128,8 @@ const Record = () => {
   if (!permission.granted) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.permissionText}>
-          We need your permission to access the camera
-        </Text>
-        <TouchableOpacity
-          style={styles.permissionButton}
-          onPress={requestPermission}
-        >
+        <Text style={styles.permissionText}>We need your permission to access the camera</Text>
+        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
           <Text style={styles.permissionButtonText}>Grant Permission</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -68,12 +138,11 @@ const Record = () => {
 
   const handleStart = () => {
     setIsCountdownActive(true);
-    // TODO: Set duration to 10 seconds
-    setCountdown(5); // Reset countdown when "start" is pressed
+    setCountdown(5);
     if (cam && cam.recordAsync) {
-        setVideoUriPromise(cam.recordAsync());
+      setVideoUriPromise(cam.recordAsync());
     } else {
-        console.error("Camera is not initialized or does not have recordAsync method");
+      console.error("Camera is not initialized or does not have recordAsync method");
     }
   };
 
@@ -85,17 +154,25 @@ const Record = () => {
     <View style={styles.container}>
       <ImageBackground
         source={{
-          uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background", // Replace with your background image
+          uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background",
         }}
         style={styles.backgroundImage}
       >
         {/* Title */}
-        <View style={styles.header}>
-          <Text style={styles.title}>tell the world how you really feel!</Text>
+        <View style={[styles.header, { marginTop: height * 0.10 }]}>
+        {/* Prompt Display */}
+          <View style={styles.promptContainer}>
+            <Text style={[styles.promptLabel, { fontSize: width * 0.06 }]}>
+              prompt of the day:
+            </Text>
+            <Text style={[styles.promptText, { fontSize: width * 0.05 }]}>
+              {prompt}
+            </Text>
+          </View>
         </View>
 
         {/* Camera Rectangle */}
-        <View style={styles.cameraContainer}>
+        <View style={[styles.cameraContainer, { width: width * 0.9, height: height * 0.55 }]}>
           <CameraView
             style={styles.camera}
             facing={facing}
@@ -103,10 +180,7 @@ const Record = () => {
             mode="video"
           >
             <View style={styles.overlay}>
-              <TouchableOpacity
-                style={styles.flipButton}
-                onPress={toggleCameraFacing}
-              >
+              <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
                 <Text style={styles.flipButtonText}>Flip Camera</Text>
               </TouchableOpacity>
             </View>
@@ -116,21 +190,17 @@ const Record = () => {
         {/* Countdown Badge */}
         <View style={styles.badgeContainer}>
           <View style={styles.badge}>
-          <Pressable onPress={() => router.push('/videoFeatures/youdidit')}>
-              <Text style={styles.badgeText}>
-              {countdown > 0 ? countdown : "Done"}
+            <Pressable onPress={() => router.push('/videoFeatures/youdidit')}>
+              <Text style={[styles.badgeText, { fontSize: width * 0.06 }]}>
+                {countdown > 0 ? countdown : "Done"}
               </Text>
             </Pressable>
           </View>
         </View>
 
         {/* Start Button */}
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={handleStart}
-          disabled={isCountdownActive && countdown > 0} // Disable during countdown
-        >
-          <Text style={styles.startButtonText}>
+        <TouchableOpacity style={styles.startButton} onPress={handleStart} disabled={isCountdownActive && countdown > 0}>
+          <Text style={[styles.startButtonText, { fontSize: width * 0.06 }]}>
             {isCountdownActive && countdown > 0 ? "Running..." : "start"}
           </Text>
         </TouchableOpacity>
@@ -151,52 +221,50 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
-    marginTop: 120,
-    paddingHorizontal: 10,
+    paddingHorizontal: "5%",
+    alignItems: "center",
   },
   title: {
     fontFamily: "Hind_700Bold",
-    fontSize: 35,
     color: "white",
     textAlign: "center",
     lineHeight: 45,
   },
-  nextButton: {
-    backgroundColor: '#333',
-    borderRadius: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 0,
-    borderColor: '#444',
-    padding: 15, 
-    height: 60,
-    width: '90%',
-    marginBottom: 25,
+  promptContainer: {
+    alignItems: "center",
+    marginTop: 10,
   },
-  nextButtonPressed: {
-    backgroundColor: '#444',
+  promptLabel: {
+    fontFamily: "Gluten_700Bold",
+    color: "white",
+    textAlign: "center",
+    marginTop: "6%",
+  },
+  promptText: {
+    fontFamily: "Hind_700Bold",
+    color: "white",
+    textAlign: "center",
+    marginTop: 5,
   },
   cameraContainer: {
-    width: 350, // Width of the camera rectangle
-    height: 450, // Height of the camera rectangle
     borderRadius: 40,
-    overflow: "hidden", // Clips anything outside the rectangle
-    marginTop: 1,
+    overflow: "hidden",
+    marginTop: "3%",
   },
   camera: {
-    flex: 1, // Ensures the camera fills the container
+    flex: 1,
   },
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    padding: 20,
+    padding: "5%",
   },
   flipButton: {
     backgroundColor: "white",
     borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: "2%",
+    paddingHorizontal: "5%",
   },
   flipButtonText: {
     fontSize: 16,
@@ -205,29 +273,32 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     position: "absolute",
-    top: 50,
-    right: 20,
+    top: "5%",
+    right: "3%",
+    alignItems: "flex-end",
   },
   badge: {
-    backgroundColor: "red",
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    backgroundColor: "rgba(255, 0, 0, 0.85)",
+    borderRadius: 15,
+    paddingVertical: "1.5%",
+    paddingHorizontal: "4%",
+    minWidth: "40%",
+    alignItems: "center",
+    marginTop: "10%",
   },
   badgeText: {
-    fontSize: 18,
     fontFamily: "Hind_700Bold",
     color: "white",
+    textAlign: "right",
   },
   startButton: {
     backgroundColor: "white",
     borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 60,
-    marginBottom: 50,
+    paddingVertical: "4%",
+    paddingHorizontal: "15%",
+    marginBottom: "5%",
   },
   startButtonText: {
-    fontSize: 20,
     fontFamily: "Gluten_700Bold",
     color: "black",
   },
@@ -236,13 +307,13 @@ const styles = StyleSheet.create({
     fontFamily: "Hind_700",
     color: "white",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: "5%",
   },
   permissionButton: {
     backgroundColor: "white",
     borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: "3%",
+    paddingHorizontal: "6%",
   },
   permissionButtonText: {
     fontSize: 16,

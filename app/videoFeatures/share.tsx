@@ -57,7 +57,7 @@ const ShareMedia = () => {
 
         {/* Done Button */}
         <View style={styles.footer}>
-          <Pressable style={styles.readyButton} onPress={() => router.push("/videoFeatures/Feed")}> 
+          <Pressable style={styles.readyButton} onPress={() => router.push("/videoFeatures/Home")}> 
             <Text style={styles.readyButtonText}>done</Text>
           </Pressable>
         </View>
