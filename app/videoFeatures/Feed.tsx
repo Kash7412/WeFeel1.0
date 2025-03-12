@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
-  Alert,
   Image,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -37,60 +36,97 @@ const DailyPrompt = () => {
   );
 };
 
+//TODO: Add this to the utils folder
+export const getVideoURLs = async (videoPaths: string[]): Promise<string[]> => {
+  try {
+    const bucketName = "wefeel-videos"; // Make sure this matches your actual bucket name in Supabase
+
+    const videoURLs = await Promise.all(
+      videoPaths.map(async (path) => {
+        // Remove "videos/" prefix if it exists
+        const filePath = path;
+
+        console.log("🔎 Fetching signed URL for:", filePath);
+
+        const { data, error } = await supabase.storage
+          .from(bucketName)
+          .createSignedUrl(filePath, 3600); // 1-hour expiration
+
+        if (error) {
+          console.error("❌ Error generating signed URL for:", filePath, error.message);
+          return null;
+        }
+        return data.signedUrl;
+      })
+    );
+
+    return videoURLs.filter((url) => url !== null); // Remove any failed URLs
+  } catch (error) {
+    console.error("❌ Error in getVideoURLs function:", error);
+    return [];
+  }
+};
+
 export default function Feed() {
   const [videos, setVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef(null);
+  const flatListRef = useRef<FlatList<string> | null>(null);
 
   useEffect(() => {
     fetchVideos();
   }, []);
 
   // Fetches 3 random videos from today's date
-  const fetchVideos = async (retryCount = 0) => {
+  const fetchVideos = async () => {
     try {
-      const today = moment().tz("America/Los_Angeles").startOf('day').format("YYYY-MM-DD HH:mm:ss");
+      const today = moment().tz("America/Los_Angeles").startOf("day").format("YYYY-MM-DD HH:mm:ss");
       console.log("📤 Fetching videos for:", today);
-  
+
       const { data, error } = await supabase.rpc("get_random_videos", {
         today_date: today,
-        video_limit: 3
+        video_limit: 3,
       });
-  
+
       if (error) {
         console.error("❌ Error fetching videos from Supabase:", error.message);
+        setLoading(false);
         return;
       }
-  
-      console.log("✅ Received videos:", Array.isArray(data[0]) ? data[0] : data);
-      if (Array.isArray(data)) {
-        console.log("✅ Received videos:", data);
-      } else {
-        console.log("🚨 Data is not an array:", data);
+
+      if (data && Array.isArray(data)) {
+        const videoPaths = data.map((item) => item.video_url); // Extract paths
+        const videoURLs = await getVideoURLs(videoPaths); // Convert to full URLs
+        setVideos(videoURLs); // Store URLs in state
       }
-      console.log("✅ Received videos:", JSON.stringify(data, null, 2));
+
+      setLoading(false);
     } catch (error) {
       console.error("❌ Error in fetchVideos function:", error);
+      setLoading(false);
     }
   };
 
   return (
-    <ImageBackground source={{ uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background" }} style={styles.backgroundImage}>
+    <ImageBackground
+      source={{ uri: "https://via.placeholder.com/400x800.png?text=Blurred+Background" }}
+      style={styles.backgroundImage}
+    >
       {loading ? (
         <ActivityIndicator size="large" color="white" />
       ) : (
         <FlatList
+          ref={flatListRef}
           data={videos}
           pagingEnabled
           horizontal={false}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item} // Use unique video URL as key
           renderItem={({ item, index }) => <VideoCard videoUrl={item} isActive={index === currentIndex} />}
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={({ viewableItems }) => {
             if (viewableItems.length > 0) {
-              setCurrentIndex(viewableItems[0].index);
+              setCurrentIndex(viewableItems[0].index ?? 0);
             }
           }}
           viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
@@ -135,22 +171,22 @@ const styles = StyleSheet.create({
   },
   userProfile: {
     position: "absolute",
-    top: height * 0.1, 
-    left: width * 0.05, 
+    top: height * 0.1,
+    left: width * 0.05,
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 25,
     padding: 8,
   },
   profilePic: {
-    width: width * 0.13, 
+    width: width * 0.13,
     height: width * 0.13,
     borderRadius: (width * 0.13) / 2,
     marginRight: width * 0.03,
   },
   username: {
     color: "white",
-    fontSize: width * 0.045, 
+    fontSize: width * 0.045,
     fontWeight: "bold",
     textShadowColor: "grey",
     textShadowOffset: { width: -1, height: 1 },
@@ -159,7 +195,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     width: "100%",
-    height: height * 0.9, 
+    height: height * 0.9,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "black",
@@ -172,13 +208,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: height * 0.1,
     right: width * 0.05,
-    padding: width * 0.02, 
+    padding: width * 0.02,
     borderRadius: 8,
     maxWidth: "40%",
   },
   promptText: {
     fontWeight: "bold",
-    fontSize: width * 0.08, 
+    fontSize: width * 0.08,
     textShadowColor: "black",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
