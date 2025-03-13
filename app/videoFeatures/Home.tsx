@@ -6,13 +6,13 @@ const Home: FC = () => {
     const router = useRouter();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions(); // Dynamically get screen width & height
 
-    const cardMargin = screenWidth * 0.015; // Adjust margins based on screen size
-    const cardPadding = screenWidth * 0.02;
-    const gridPadding = screenWidth * 0.02;
-    const gridBorderRadius = screenWidth * 0.05;
+    const cardMargin = screenWidth * 0.01; // ✅ Reduced margin
+    const cardPadding = screenWidth * 0.015; // ✅ Reduced padding
+    const gridPadding = screenWidth * 0.015;
+    const gridBorderRadius = screenWidth * 0.04;
 
-    // Calculate dynamic width for each card
-    const cardWidth = (screenWidth - (cardMargin * 6) - (gridPadding * 2)) / 3;
+    // ✅ Increased card width by reducing spacing
+    const cardWidth = (screenWidth - (cardMargin * 4) - (gridPadding * 2)) / 3.2; 
 
     const handleNavigation = (path: string) => {
         router.push(path);
@@ -28,9 +28,9 @@ const Home: FC = () => {
                 >
                     <Image 
                         source={require("../../assets/profile.png")}
-                        style={[styles.profileImage, { width: screenWidth * 0.12, height: screenWidth * 0.12 }]} 
+                        style={[styles.profileImage, { width: screenWidth * 0.15, height: screenWidth * 0.15 }]} 
                     />
-                    <Text style={[styles.title, { fontSize: screenWidth * 0.12 }]}>WeFeel</Text>
+                    <Text style={[styles.title, { fontSize: screenWidth * 0.13 }]}>WeFeel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     onPress={() => handleNavigation('/admin/settings')}
@@ -38,13 +38,13 @@ const Home: FC = () => {
                 >
                     <Image 
                         source={require("../../assets/settings-25-128.png")}
-                        style={[styles.settingsIcon, { width: screenWidth * 0.1, height: screenWidth * 0.1 }]} 
+                        style={[styles.settingsIcon, { width: screenWidth * 0.12, height: screenWidth * 0.12 }]} 
                     />
                 </TouchableOpacity>
             </View>
 
             {/* Section Title */}
-            <Text style={[styles.sectionTitle, { fontSize: screenWidth * 0.05 }]}>mine</Text>
+            <Text style={[styles.sectionTitle, { fontSize: screenWidth * 0.06 }]}>mine</Text>
 
             {/* Grid Section */}
             <View style={[styles.grid, { padding: gridPadding, borderRadius: gridBorderRadius }]}>
@@ -54,7 +54,7 @@ const Home: FC = () => {
                         style={{ alignItems: 'center', width: '100%', height: '100%' }}
                     >
                         <Image 
-                            style={[styles.image, { width: '45%', aspectRatio: 1 }]}
+                            style={[styles.image, { width: '50%', aspectRatio: 1 }]}
                             source={require("../../assets/shareicon.png")}
                             resizeMode="contain"
                         />
@@ -66,9 +66,9 @@ const Home: FC = () => {
                     <TouchableOpacity 
                         onPress={() => handleNavigation('/videoFeatures/record')}
                         style={{ alignItems: 'center', width: '100%', height: '100%' }}
-                    >
+                    > 
                         <Image 
-                            style={[styles.image, { width: '100%', height: '120%', aspectRatio: 1 }]}
+                            style={[styles.image, { width: '100%', height: '100%', aspectRatio: 1 }]}
                             source={require("../../assets/WeFeelHike.png")}
                             resizeMode="cover"
                         />
@@ -81,7 +81,7 @@ const Home: FC = () => {
 
                 <View style={[styles.card, { width: cardWidth }]}>
                     <Image 
-                        style={[styles.image, { width: '45%', aspectRatio: 1 }]}
+                        style={[styles.image, { width: '50%', aspectRatio: 1 }]}
                         source={require("../../assets/vidcam.png")}
                         resizeMode="contain"
                     />
@@ -92,10 +92,10 @@ const Home: FC = () => {
             </View>
 
             {/* The World Section */}
-            <Text style={[styles.sectionTitle, { fontSize: screenWidth * 0.05, marginTop: screenHeight * 0.02 }]}>the world</Text>
-            <View style={[styles.card, { width: screenWidth * 0.85, height: screenHeight * 0.6, backgroundColor: "grey" }]}>
+            <Text style={[styles.sectionTitle, { fontSize: screenWidth * 0.06, marginTop: screenHeight * 0.02 }]}>the world</Text>
+            <View style={[styles.card, { width: screenWidth * 0.92, height: screenHeight * 0.6, backgroundColor: "grey" }]}>
                 <Image 
-                    style={[styles.image, { width: '120%', height: '120%', aspectRatio: 1 }]}
+                    style={[styles.image, { width: '100%', height: '100%', aspectRatio: 1 }]}
                     source={require("../../assets/exampWeFeel.png")}
                     resizeMode="cover"
                 />
@@ -110,7 +110,7 @@ const Home: FC = () => {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button}>
-                        <Text style={[styles.cardText, { fontSize: screenWidth * 0.08 }]}>
+                        <Text style={[styles.cardText, { fontSize: screenWidth * 0.07 }]}>
                             Share a video of something that made you smile!
                         </Text>
                     </TouchableOpacity>
@@ -123,30 +123,28 @@ const Home: FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: '5%',
+        paddingHorizontal: '3%', // ✅ Reduced left & right margins
         backgroundColor: "black"
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between', // ✅ Improved alignment
         alignItems: 'center',
-        marginTop: '10%',
+        marginTop: '15%',
         marginBottom: '2%'
     },
     title: {
         fontFamily: 'Gluten_700Bold',
         color: '#ffffff',
-        textAlign: 'center'
     },
     sectionTitle: {
         fontFamily: 'RedHatDisplay_400Regular',
         fontWeight: 'bold',
         color: '#ffffff',
-        textAlign: 'left'
     },
     grid: {
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between', // ✅ Evenly distributed cards
         flexWrap: 'nowrap',
         backgroundColor: '#eee',
         height: '18%'
@@ -156,12 +154,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 40,
         overflow: 'hidden',
-        margin: '2%'
+        margin: '.3%' // ✅ Reduced margins
     },
     image: {
         width: '100%',
         height: '60%',
-        marginBottom: 10
     },
     cardText: {
         fontFamily: 'RedHatDisplay_400Regular',
@@ -188,10 +185,10 @@ const styles = StyleSheet.create({
     },
     profileImage: {
         borderRadius: 50,
-        marginRight: '5%'
+        marginRight: '3%'
     },
     settingsButton: {
-        marginLeft: '5%',
+        marginRight: '3%',
     },
     settingsIcon: {
         marginLeft: 0,
