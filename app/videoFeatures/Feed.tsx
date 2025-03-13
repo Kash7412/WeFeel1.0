@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
+  Pressable,
   Image,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useRouter } from "expo-router";
-import { supabase } from "../../utils/supabase";
-import moment from "moment-timezone"; // Ensure moment.js is installed
+import { fetchVideos } from "../../utils/getNewVideos"; // Import video fetching logic
+import { useFocusEffect } from "@react-navigation/native"; // Required for detecting page navigation
 
 const { width, height } = Dimensions.get("window");
 
@@ -36,77 +37,42 @@ const DailyPrompt = () => {
   );
 };
 
-//TODO: Add this to the utils folder
-export const getVideoURLs = async (videoPaths: string[]): Promise<string[]> => {
-  try {
-    const bucketName = "wefeel-videos"; // Make sure this matches your actual bucket name in Supabase
-
-    const videoURLs = await Promise.all(
-      videoPaths.map(async (path) => {
-        // Remove "videos/" prefix if it exists
-        const filePath = path;
-
-        console.log("🔎 Fetching signed URL for:", filePath);
-
-        const { data, error } = await supabase.storage
-          .from(bucketName)
-          .createSignedUrl(filePath, 3600); // 1-hour expiration
-
-        if (error) {
-          console.error("❌ Error generating signed URL for:", filePath, error.message);
-          return null;
-        }
-        return data.signedUrl;
-      })
-    );
-
-    return videoURLs.filter((url) => url !== null); // Remove any failed URLs
-  } catch (error) {
-    console.error("❌ Error in getVideoURLs function:", error);
-    return [];
-  }
-};
-
 export default function Feed() {
   const [videos, setVideos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<string> | null>(null);
+  const videoPlayersRef = useRef<{ [key: string]: any }>({}); // Store player instances
 
   useEffect(() => {
-    fetchVideos();
+    const loadVideos = async () => {
+      console.log("📤 Fetching video links...");
+      const videoURLs = await fetchVideos();
+      console.log("✅ Fetched video URLs:", videoURLs);
+      setVideos(videoURLs);
+      setLoading(false);
+    };
+
+    loadVideos();
   }, []);
 
-  // Fetches 3 random videos from today's date
-  const fetchVideos = async () => {
-    try {
-      const today = moment().tz("America/Los_Angeles").startOf("day").format("YYYY-MM-DD HH:mm:ss");
-      console.log("📤 Fetching videos for:", today);
-
-      const { data, error } = await supabase.rpc("get_random_videos", {
-        today_date: today,
-        video_limit: 3,
-      });
-
-      if (error) {
-        console.error("❌ Error fetching videos from Supabase:", error.message);
-        setLoading(false);
-        return;
-      }
-
-      if (data && Array.isArray(data)) {
-        const videoPaths = data.map((item) => item.video_url); // Extract paths
-        const videoURLs = await getVideoURLs(videoPaths); // Convert to full URLs
-        setVideos(videoURLs); // Store URLs in state
-      }
-
-      setLoading(false);
-    } catch (error) {
-      console.error("❌ Error in fetchVideos function:", error);
-      setLoading(false);
-    }
-  };
+  // ⏹️ Pause all videos when the user leaves the page
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        console.log("🚨 Pausing all videos as user leaves the Feed page.");
+        Object.values(videoPlayersRef.current).forEach((player) => {
+          if (player && typeof player.pause === "function") {
+            try {
+              player.pause();
+            } catch (error) {
+              console.warn("⚠️ Skipping pause for unmounted player:", error);
+            }
+          }
+        });
+      };
+    }, [])
+  );
 
   return (
     <ImageBackground
@@ -121,8 +87,16 @@ export default function Feed() {
           data={videos}
           pagingEnabled
           horizontal={false}
-          keyExtractor={(item) => item} // Use unique video URL as key
-          renderItem={({ item, index }) => <VideoCard videoUrl={item} isActive={index === currentIndex} />}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <VideoCard
+              videoUrl={item}
+              isActive={index === currentIndex}
+              isLast={index === videos.length - 1}
+              index={index}
+              videoPlayersRef={videoPlayersRef} // Pass down reference to manage players
+            />
+          )}
           showsVerticalScrollIndicator={false}
           onViewableItemsChanged={({ viewableItems }) => {
             if (viewableItems.length > 0) {
@@ -138,30 +112,58 @@ export default function Feed() {
   );
 }
 
-const VideoCard = ({ videoUrl, isActive }: { videoUrl: string; isActive: boolean }) => {
+interface VideoCardProps {
+  videoUrl: string;
+  isActive: boolean;
+  isLast: boolean;
+  index: number;
+  videoPlayersRef: React.MutableRefObject<{ [key: string]: any }>;
+}
+
+const VideoCard: React.FC<VideoCardProps> = ({ videoUrl, isActive, isLast, index, videoPlayersRef }) => {
   const player = useVideoPlayer(videoUrl);
+  const router = useRouter();
 
   useEffect(() => {
+    videoPlayersRef.current[videoUrl] = player; // Store player reference
+
     if (isActive) {
+      console.log("▶️ Playing video:", videoUrl);
       player.play();
       player.loop = true;
     } else {
+      console.log("⏸️ Pausing video:", videoUrl);
       player.pause();
     }
+
+    return () => {
+      console.log("🧹 Cleaning up player for:", videoUrl);
+      if (player && typeof player.pause === "function") {
+        try {
+          player.pause();
+        } catch (error) {
+          console.warn("⚠️ Error pausing unmounted player:", error);
+        }
+      }
+      delete videoPlayersRef.current[videoUrl];
+    };
   }, [isActive]);
+
+  const navigateHome = () => {
+    router.navigate("/videoFeatures/Home");
+  };
 
   return (
     <View style={styles.videoContainer}>
       <VideoView style={styles.video} player={player} allowsFullscreen allowsPictureInPicture />
+      <Pressable style={styles.backToHomeButton} onPress={navigateHome} disabled={!isLast}>
+        <Text style={styles.buttonText}>{isLast ? "Go to Home" : `${index + 1}/${6}`}</Text>
+      </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "black",
-  },
   backgroundImage: {
     flex: 1,
     justifyContent: "center",
@@ -194,8 +196,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   videoContainer: {
-    width: "100%",
-    height: height * 0.9,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "black",
@@ -204,29 +206,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  promptContainer: {
-    position: "absolute",
-    top: height * 0.1,
-    right: width * 0.05,
-    padding: width * 0.02,
-    borderRadius: 8,
-    maxWidth: "40%",
+  backToHomeButton: {
+    justifyContent: "center",
+    bottom: 150,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
   },
-  promptText: {
+  buttonText: {
+    color: "black",
     fontWeight: "bold",
-    fontSize: width * 0.08,
-    textShadowColor: "black",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 1,
-    marginBottom: 5,
-    color: "white",
-  },
-  prompt: {
-    fontSize: width * 0.05,
-    fontWeight: "bold",
-    textShadowColor: "black",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 1,
-    color: "white",
   },
 });
