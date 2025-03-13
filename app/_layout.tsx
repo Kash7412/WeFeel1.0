@@ -36,27 +36,6 @@ const RootLayout = () => {
         }}
       />
       <Stack.Screen
-        name="Login/code"
-        options={{
-          headerTitle: () => (
-            <Text
-              style={{
-                fontFamily: "Hind_700Bold",
-                color: "white",
-                fontSize: 20,
-              }}
-            >
-              1/5
-            </Text>
-          ),
-          headerBackTitle: "Start",
-          headerStyle: {
-            backgroundColor: "black",
-          },
-          headerTintColor: "white",
-        }}
-      />
-      <Stack.Screen
         name="Login/explainer"
         options={{
           headerTitle: () => (
@@ -67,7 +46,7 @@ const RootLayout = () => {
                 fontSize: 20,
               }}
             >
-              3/5
+              2/5
             </Text>
           ),
           headerBackTitle: "2/5",
@@ -88,10 +67,10 @@ const RootLayout = () => {
                 fontSize: 20,
               }}
             >
-              4/5
+              3/5
             </Text>
           ),
-          headerBackTitle: "3/5",
+          headerBackTitle: "2/5",
           headerStyle: {
             backgroundColor: "black",
           },
@@ -109,10 +88,10 @@ const RootLayout = () => {
                 fontSize: 20,
               }}
             >
-              5/5
+              4/5
             </Text>
           ),
-          headerBackTitle: "4/5",
+          headerBackTitle: "3/5",
           headerStyle: {
             backgroundColor: "black",
           },
