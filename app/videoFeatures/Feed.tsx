@@ -16,6 +16,8 @@ import { fetchVideos } from "../../utils/getNewVideos"; // Import video fetching
 import { useFocusEffect } from "@react-navigation/native"; // Required for detecting page navigation
 
 const { width, height } = Dimensions.get("window");
+const [prompt, setPrompt] = useState("Loading prompt...");
+
 
 // User profile UI
 const UserProfile = () => {
@@ -32,7 +34,7 @@ const DailyPrompt = () => {
   return (
     <View style={styles.promptContainer}>
       <Text style={styles.promptText}>Today's prompt:</Text>
-      <Text style={styles.prompt}>Share a video of something that made you smile!</Text>
+      <Text style={styles.prompt}>{prompt}</Text>
     </View>
   );
 };
@@ -43,6 +45,7 @@ export default function Feed() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<string> | null>(null);
   const videoPlayersRef = useRef<{ [key: string]: any }>({}); // Store player instances
+
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -73,6 +76,7 @@ export default function Feed() {
       };
     }, [])
   );
+
 
   return (
     <ImageBackground
@@ -207,14 +211,41 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   backToHomeButton: {
-    justifyContent: "center",
-    bottom: 150,
-    backgroundColor: "white",
+    justifyContent: 'center',
+    bottom: 150, // Positioned at the bottom of the video
+    backgroundColor: 'white', // Button color
     padding: 10,
     borderRadius: 5,
   },
   buttonText: {
-    color: "black",
-    fontWeight: "bold",
+    color: 'black', // Text color
+    fontWeight: 'bold',
+  },
+  promptText: {
+    fontWeight: 'bold',
+    fontFamily: 'Gluten_700Bold',
+    fontSize: 32,
+    textShadowColor: 'black',  // Shadow color that will act as the outline
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 1,
+    marginBottom: 5,
+    color: 'white'
+  },
+  prompt: {
+    fontSize: 21,
+    fontWeight: 'bold',
+    fontFamily: 'Gluten_700Bold',
+    textShadowColor: 'black',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 1,
+    color: 'white'
+  },
+  promptContainer: {
+    position: 'absolute',
+    top: 100,
+    right: 20,
+    padding: 10,
+    borderRadius: 8,
+    maxWidth: '40%',  // Adjust based on your layout needs
   },
 });
