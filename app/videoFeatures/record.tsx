@@ -162,10 +162,10 @@ const Record = () => {
         <View style={[styles.header, { marginTop: height * 0.10 }]}>
         {/* Prompt Display */}
           <View style={styles.promptContainer}>
-            <Text style={[styles.promptLabel, { fontSize: width * 0.06 }]}>
+            <Text style={[styles.promptLabel, { fontSize: width * 0.075 }]}>
               prompt of the day:
             </Text>
-            <Text style={[styles.promptText, { fontSize: width * 0.05 }]}>
+            <Text style={[styles.promptText, { fontSize: width * 0.055 }]}>
               {prompt}
             </Text>
           </View>
@@ -233,6 +233,7 @@ const styles = StyleSheet.create({
   promptContainer: {
     alignItems: "center",
     marginTop: 10,
+    width: "100%",
   },
   promptLabel: {
     fontFamily: "Gluten_700Bold",
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
     fontFamily: "Hind_700Bold",
     color: "white",
     textAlign: "center",
-    marginTop: 5,
+    marginTop: 10,
   },
   cameraContainer: {
     borderRadius: 40,

@@ -11,12 +11,14 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { uploadVideoToSupabase } from "../../utils/uploadVideo";
+import { supabase } from "../../utils/supabase"; // ✅ Import Supabase client
 
 export default function Playback() {
-  const params = useLocalSearchParams();
+  const { width, height } = useWindowDimensions(); // ✅ Get screen size dynamically
   const router = useRouter();
-  const { width, height } = useWindowDimensions(); // Get screen size
-  const [isUploading, setIsUploading] = useState(false); // State for loading indicator
+  const params = useLocalSearchParams();
+  const [isUploading, setIsUploading] = useState(false);
+  const [prompt, setPrompt] = useState<string>("Loading prompt..."); // ✅ Initial state for prompt
 
   const videoUri = useMemo(() => {
     return Array.isArray(params.uri) ? params.uri[0] : params.uri;
@@ -26,6 +28,41 @@ export default function Playback() {
     player.loop = true;
     player.play();
   });
+
+  // ✅ Fetch "Prompt of the Day" from Supabase
+  useEffect(() => {
+    const fetchPromptOfTheDay = async () => {
+      const today = new Date().toISOString().split("T")[0];
+
+      let { data: existingPrompt, error } = await supabase
+        .from("prompt_of_the_day")
+        .select("prompt_id")
+        .eq("date", today)
+        .single();
+
+      if (error || !existingPrompt) {
+        console.error("Error fetching today's prompt:", error?.message);
+        setPrompt("Error loading prompt");
+        return;
+      }
+
+      let { data: promptData, error: promptError } = await supabase
+        .from("prompts")
+        .select("text")
+        .eq("id", existingPrompt.prompt_id)
+        .single();
+
+      if (promptError || !promptData) {
+        console.error("Error fetching prompt text:", promptError?.message);
+        setPrompt("Error loading prompt");
+        return;
+      }
+
+      setPrompt(promptData.text ?? "Error loading prompt"); // ✅ Set the prompt text
+    };
+
+    fetchPromptOfTheDay();
+  }, []);
 
   const handleSend = async () => {
     setIsUploading(true);
@@ -45,14 +82,23 @@ export default function Playback() {
         }}
         style={styles.backgroundImage}
       >
-        {/* Title */}
-        <View style={styles.header}>
-          <Text style={styles.subtitle}>watch your</Text>
-          <Text style={styles.title}>masterpiece</Text>
+        {/* Header Section (Title + Prompt) */}
+        <View style={[styles.header, { marginTop: height * 0.08 }]}>
+          <Text style={[styles.subtitle, { fontSize: width * 0.08, lineHeight: width * 0.1 }]}>
+            watch your
+          </Text>
+          <Text style={[styles.title, { fontSize: width * 0.09, lineHeight: width * 0.11 }]}>
+            masterpiece
+          </Text>
+
+          {/* ✅ Prompt of the Day Section */}
+          <Text style={[styles.promptText, { fontSize: width * 0.06, maxWidth: width * 0.85 }]}>
+            {prompt}
+          </Text>
         </View>
 
-        {/* Video Player Container */}
-        <View style={[styles.videoContainer, { width: width * 0.9, height: height * 0.45 }]}>
+        {/* Video Player (Shifted Higher) */}
+        <View style={[styles.videoContainer, { width: width * 0.95, height: height * 0.42 }]}>
           <VideoView
             style={styles.video}
             player={player}
@@ -64,9 +110,11 @@ export default function Playback() {
         {/* Uploading Spinner */}
         {isUploading && <ActivityIndicator size="large" color="white" style={styles.loadingSpinner} />}
 
-        {/* Send Button */}
-        <Pressable style={[styles.nextButton, { width: width * 0.8 }]} onPress={handleSend} disabled={isUploading}>
-          <Text style={styles.nextButtonText}>{isUploading ? "Uploading..." : "Send"}</Text>
+        {/* Send Button (Shifted Higher) */}
+        <Pressable style={[styles.nextButton, { width: width * 0.85, marginTop: height * 0.02 }]} onPress={handleSend} disabled={isUploading}>
+          <Text style={[styles.nextButtonText, { fontSize: width * 0.06 }]}>
+            {isUploading ? "Uploading..." : "Send"}
+          </Text>
         </Pressable>
       </ImageBackground>
     </View>
@@ -85,23 +133,32 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   header: {
-    marginTop: "15%",
-    paddingHorizontal: 10,
+    paddingHorizontal: "5%",
     alignItems: "center",
   },
   subtitle: {
     fontFamily: "Hind_700",
-    fontSize: 36,
     color: "#ffffff",
-    lineHeight: 44,
   },
   title: {
-    fontSize: 38,
     fontFamily: "Gluten_700Bold",
     color: "white",
     textAlign: "center",
-    marginTop: 5,
-    marginBottom: 10,
+    marginTop: "1.5%",
+    marginBottom: "3%",
+  },
+  /* ✅ Updated Styles for Prompt */
+  promptLabel: {
+    fontFamily: "Gluten_700Bold",
+    color: "white",
+    marginTop: "3%",
+    textAlign: "center",
+  },
+  promptText: {
+    fontFamily: "Hind_700",
+    color: "white",
+    textAlign: "center",
+    marginTop: "1.5%",
   },
   videoContainer: {
     borderRadius: 20,
@@ -115,19 +172,18 @@ const styles = StyleSheet.create({
     objectFit: "cover", // Alternative for resizeMode
   },
   loadingSpinner: {
-    marginVertical: 20,
+    marginVertical: "3%",
   },
   nextButton: {
     backgroundColor: "white",
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 15,
-    maxWidth: 300,
-    marginBottom: "8%",
+    paddingVertical: "4%",
+    maxWidth: "85%",
+    marginBottom: "6%",
   },
   nextButtonText: {
-    fontSize: 22,
     fontFamily: "Gluten_700Bold",
     color: "black",
     textAlign: "center",
