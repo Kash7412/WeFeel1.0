@@ -44,7 +44,7 @@ export const fetchVideos = async (): Promise<string[]> => {
 
     const { data, error } = await supabase.rpc("get_random_videos", {
       today_date: today,
-      video_limit: 3,
+      video_limit: 5,
     });
 
     if (error) {
