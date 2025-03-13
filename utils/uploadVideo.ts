@@ -1,7 +1,7 @@
 import { supabase } from "./supabase";
 import * as FileSystem from "expo-file-system";
 import { Alert } from "react-native";
-import moment from "moment"; // ✅ Helps format date
+import moment from "moment-timezone"; // ✅ Helps format date
 
 global.Buffer = require("buffer").Buffer;
 
@@ -25,7 +25,7 @@ export async function uploadVideoToSupabase(videoUri: string) {
     }
 
     const userId = user.user.id; // ✅ Extract user ID
-    const date = moment().format("DD-MM-YYYY"); // ✅ Format as "Day-Month-Year"
+    const date = moment().tz("America/Los_Angeles").format("DD-MM-YYYY");
     const fileName = `${userId}_${date}.mp4`;
     filePath = `videos/${fileName}`;
 
