@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.wefeel.firstapp", 
+      "bundleIdentifier": "com.wefeel.firstapp",
       "config": {
         "usesAppleSignIn": true
       }
@@ -24,7 +24,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.wefeel.firstapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
