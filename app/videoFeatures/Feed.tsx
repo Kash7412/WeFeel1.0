@@ -217,4 +217,31 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "bold",
   },
+  promptText: {
+    fontWeight: 'bold',
+    fontFamily: 'Gluten_700Bold',
+    fontSize: 32,
+    textShadowColor: 'black',  // Shadow color that will act as the outline
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 1,
+    marginBottom: 5,
+    color: 'white'
+  },
+  prompt: {
+    fontSize: 21,
+    fontWeight: 'bold',
+    fontFamily: 'Gluten_700Bold',
+    textShadowColor: 'black',
+    textShadowOffset: { width: -1, height: 1 },
+    textShadowRadius: 1,
+    color: 'white'
+  },
+  promptContainer: {
+    position: 'absolute',
+    top: 100,
+    right: 20,
+    padding: 10,
+    borderRadius: 8,
+    maxWidth: '40%',  // Adjust based on your layout needs
+  },
 });
