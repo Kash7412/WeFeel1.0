@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { 
   View, 
   Text, 
   StyleSheet, 
   Pressable, 
   ActivityIndicator, 
-  Alert 
+  Alert,
+  Dimensions,
+  Platform
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { supabase } from "../utils/supabase";
 import type { User } from "@supabase/supabase-js";
+
+const { width, height } = Dimensions.get("window");
 
 const LandingPage = () => {
   const router = useRouter();
@@ -103,39 +107,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "black",
-    padding: 20,
+    paddingHorizontal: width * 0.05, // 5% of screen width
   },
   title: {
     fontFamily: "Gluten_700Bold",
-    fontSize: 42,
+    fontSize: width * 0.1, // 10% of screen width
     color: "white",
-    marginBottom: 10,
+    marginBottom: height * 0.02, // 2% of screen height
     textAlign: "center",
   },
   subtitle: {
     fontFamily: "Hind_700",
-    fontSize: 22,
+    fontSize: width * 0.05, // 5% of screen width
     color: "#aaa",
-    marginBottom: 30,
+    marginBottom: height * 0.05, // 5% of screen height
     textAlign: "center",
   },
   button: {
     backgroundColor: "white",
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    marginVertical: 10,
-    width: "80%",
+    borderRadius: width * 0.08, // 8% of screen width
+    paddingVertical: height * 0.015, // 1.5% of screen height
+    paddingHorizontal: width * 0.2, // 20% of screen width
+    marginVertical: height * 0.01, // 1% of screen height
+    width: width * 0.8, // 80% of screen width
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: width * 0.045, // 4.5% of screen width
     fontFamily: "Hind_700Bold",
     color: "black",
   },
   secondaryButton: {
     backgroundColor: "transparent",
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: "white",
   },
   secondaryButtonText: {

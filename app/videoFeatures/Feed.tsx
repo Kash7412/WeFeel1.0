@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -11,30 +11,32 @@ import {
   Image,
 } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams} from "expo-router";
 import { fetchVideos } from "../../utils/getNewVideos"; // Import video fetching logic
 import { useFocusEffect } from "@react-navigation/native"; // Required for detecting page navigation
-
+import { uploadVideoToSupabase } from "../../utils/uploadVideo";
+import { supabase } from "../../utils/supabase"; 
 const { width, height } = Dimensions.get("window");
-const [prompt, setPrompt] = useState("Loading prompt...");
 
 
-// User profile UI
-const UserProfile = () => {
-  return (
-    <View style={styles.userProfile}>
-      <Image source={require("../../assets/profile.png")} style={styles.profilePic} />
-      <Text style={styles.username}>User123</Text>
-    </View>
-  );
-};
+// // User profile UI
+// const UserProfile = () => {
+//   return (
+//     <View style={styles.userProfile}>
+//       <Image source={require("../../assets/profile.png")} style={styles.profilePic} />
+//       <Text style={styles.username}>User123</Text>
+//     </View>
+//   );
+// };
 
-// Daily prompt UI
-const DailyPrompt = () => {
+// ✅ **Fixed** Daily Prompt UI (Now properly receives `prompt` as a prop)
+const DailyPrompt = ({ prompt }: { prompt: string }) => {
   return (
     <View style={styles.promptContainer}>
-      <Text style={styles.promptText}>Today's prompt:</Text>
-      <Text style={styles.prompt}>{prompt}</Text>
+      <Text style={styles.promptLabel}>Today's prompt:</Text>
+      <Text style={[styles.promptText, { fontSize: width * 0.06, maxWidth: width * 0.85 }]}>
+        {prompt}
+      </Text>
     </View>
   );
 };
@@ -45,7 +47,10 @@ export default function Feed() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<string> | null>(null);
   const videoPlayersRef = useRef<{ [key: string]: any }>({}); // Store player instances
-
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const [isUploading, setIsUploading] = useState(false);
+  const [prompt, setPrompt] = useState<string>("Loading prompt...");
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -57,7 +62,60 @@ export default function Feed() {
     };
 
     loadVideos();
-  }, []);
+    }, []);
+
+    const videoUri = useMemo(() => {
+      return Array.isArray(params.uri) ? params.uri[0] : params.uri;
+    }, [params.uri]);
+
+    const player = useVideoPlayer(videoUri, (player) => {
+      player.loop = true;
+      player.play();
+    });
+    // ✅ Fetch "Prompt of the Day" from Supabase
+    useEffect(() => {
+      const fetchPromptOfTheDay = async () => {
+        const today = new Date().toISOString().split("T")[0];
+  
+        let { data: existingPrompt, error } = await supabase
+          .from("prompt_of_the_day")
+          .select("prompt_id")
+          .eq("date", today)
+          .single();
+  
+        if (error || !existingPrompt) {
+          console.error("Error fetching today's prompt:", error?.message);
+          setPrompt("Error loading prompt");
+          return;
+        }
+  
+        let { data: promptData, error: promptError } = await supabase
+          .from("prompts")
+          .select("text")
+          .eq("id", existingPrompt.prompt_id)
+          .single();
+  
+        if (promptError || !promptData) {
+          console.error("Error fetching prompt text:", promptError?.message);
+          setPrompt("Error loading prompt");
+          return;
+        }
+  
+        setPrompt(promptData.text ?? "Error loading prompt"); // ✅ Set the prompt text
+      };
+  
+      fetchPromptOfTheDay();
+    }, []);
+  
+    const handleSend = async () => {
+      setIsUploading(true);
+      player.pause(); // Pause the video when sending
+  
+      await uploadVideoToSupabase(videoUri);
+  
+      setIsUploading(false);
+      router.push("/videoFeatures/youdidit");
+    };
 
   // ⏹️ Pause all videos when the user leaves the page
   useFocusEffect(
@@ -76,7 +134,6 @@ export default function Feed() {
       };
     }, [])
   );
-
 
   return (
     <ImageBackground
@@ -110,8 +167,7 @@ export default function Feed() {
           viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
         />
       )}
-      <UserProfile />
-      <DailyPrompt />
+      <DailyPrompt prompt={prompt} />
     </ImageBackground>
   );
 }
@@ -161,7 +217,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ videoUrl, isActive, isLast, index
     <View style={styles.videoContainer}>
       <VideoView style={styles.video} player={player} allowsFullscreen allowsPictureInPicture />
       <Pressable style={styles.backToHomeButton} onPress={navigateHome} disabled={!isLast}>
-        <Text style={styles.buttonText}>{isLast ? "Go to Home" : `${index + 1}/${6}`}</Text>
+        <Text style={styles.buttonText}>{isLast ? "Go to Home" : `${index + 1}/${5}`}</Text>
       </Pressable>
     </View>
   );
@@ -211,41 +267,44 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   backToHomeButton: {
-    justifyContent: 'center',
-    bottom: 150, // Positioned at the bottom of the video
-    backgroundColor: 'white', // Button color
+    justifyContent: "center",
+    bottom: 150,
+    backgroundColor: "white",
     padding: 10,
     borderRadius: 5,
   },
   buttonText: {
-    color: 'black', // Text color
-    fontWeight: 'bold',
+    color: "black",
+    fontWeight: "bold",
   },
-  promptText: {
-    fontWeight: 'bold',
-    fontFamily: 'Gluten_700Bold',
-    fontSize: 32,
-    textShadowColor: 'black',  // Shadow color that will act as the outline
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 1,
+  /** 🔥 "Today's Prompt" - Larger Font */
+  promptLabel: {
+    fontFamily: "Gluten_700Bold",
+    fontSize: width * 0.065, // Increased size
+    color: "white",
+    textAlign: "center",
     marginBottom: 5,
-    color: 'white'
   },
-  prompt: {
-    fontSize: 21,
-    fontWeight: 'bold',
-    fontFamily: 'Gluten_700Bold',
-    textShadowColor: 'black',
+  /** 🔥 Prompt Text - Smaller with Reduced Line Spacing */
+  promptText: {
+    fontSize: width * 0.009, // Decreased size
+    fontWeight: "bold",
+    fontFamily: "Hind_700Bold",
+    textShadowColor: "black",
     textShadowOffset: { width: -1, height: 1 },
     textShadowRadius: 1,
-    color: 'white'
+    color: "white",
+    lineHeight: width * 0.074, // Reduced spacing between lines
+    textAlign: "center",
+    marginTop: 6,
+    maxWidth: "80%",
   },
   promptContainer: {
-    position: 'absolute',
-    top: 100,
+    position: "absolute",
+    top: 80,
     right: 20,
     padding: 10,
     borderRadius: 8,
-    maxWidth: '40%',  // Adjust based on your layout needs
+    maxWidth: "60%",
   },
 });

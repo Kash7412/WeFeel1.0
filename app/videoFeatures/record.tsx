@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginTop: 10,
+    fontSize: 10,
   },
   cameraContainer: {
     borderRadius: 40,
