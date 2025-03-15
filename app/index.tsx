@@ -32,7 +32,7 @@ const LandingPage = () => {
   }, []);
 
   // 🔹 Apple Sign-In Handler
-  const handleAppleSignIn = async (redirectPath: string) => {
+  const handleAppleSignIn = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -40,31 +40,45 @@ const LandingPage = () => {
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
       });
-
+  
       if (!credential.identityToken) {
         Alert.alert("Sign-in Failed", "No identity token returned.");
         return;
       }
-
+  
       console.log("Apple Credential:", credential);
-
+  
       // 🔹 Authenticate with Supabase
       const { data, error } = await supabase.auth.signInWithIdToken({
         provider: "apple",
         token: credential.identityToken,
       });
-
+  
       if (error) {
         Alert.alert("Sign-in Failed", error.message);
         return;
       }
-
+  
       console.log("Supabase Auth Response:", data);
+      const userId = data.user?.id;
       setUser(data.user);
-
-      // Redirect based on which button was pressed
-      router.replace(redirectPath);
-
+  
+      if (userId) {
+        // 🔹 Check if profile exists
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("name")
+          .eq("id", userId)
+          .maybeSingle();  // ✅ This prevents errors if no row exists
+  
+        if (!profile || !profile?.name) {
+          // 🔹 If no profile OR name is missing, go to name entry
+          router.replace("/Login/name");
+        } else {
+          // 🔹 Otherwise, go to home
+          router.replace("/videoFeatures/Home");
+        }
+      }
     } catch (error) {
       console.error("Apple Sign-In Error:", error);
       Alert.alert("Error", "Something went wrong with Apple Sign-In.");
@@ -85,12 +99,12 @@ const LandingPage = () => {
       <Text style={styles.subtitle}>Experience the world in 60 seconds</Text>
 
       {/* Sign Up (Leads to the onboarding/initiation process) */}
-      <Pressable style={styles.button} onPress={() => handleAppleSignIn("/Login/name")}>
+      <Pressable style={styles.button} onPress={handleAppleSignIn}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
 
       {/* Log In (Leads straight to home) */}
-      <Pressable style={[styles.button, styles.secondaryButton]} onPress={() => handleAppleSignIn("/videoFeatures/Home")}>
+      <Pressable style={[styles.button, styles.secondaryButton]} onPress={handleAppleSignIn}>
         <Text style={[styles.buttonText, styles.secondaryButtonText]}>Log In</Text>
       </Pressable>
     </View>
