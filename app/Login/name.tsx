@@ -36,8 +36,8 @@ const Name = () => {
 
       // Upload name to Supabase
       const { error } = await supabase
-        .from("profiles") // Ensure "profiles" table exists in Supabase
-        .upsert([{ id: user.id, name: userName }], { onConflict: ["id"] });
+        .from("profiles")
+        .upsert([{ id: user.id, name: userName }], { onConflict: "id" });
 
       if (error) throw error;
 

@@ -20,7 +20,7 @@ import { supabase } from "../../utils/supabase"; // Ensure you have a Supabase c
 const Record = () => {
   const { width, height } = useWindowDimensions();
   const [permission, requestPermission] = useCameraPermissions();
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(10);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
   const [cam, setCam] = useState<CameraView>();
   const [videoUriPromise, setVideoUriPromise] = useState<Promise<any>>();
@@ -138,7 +138,7 @@ const Record = () => {
 
   const handleStart = () => {
     setIsCountdownActive(true);
-    setCountdown(5);
+    setCountdown(10);
     if (cam && cam.recordAsync) {
       setVideoUriPromise(cam.recordAsync());
     } else {
@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginTop: 10,
+    fontSize: 10,
   },
   cameraContainer: {
     borderRadius: 40,

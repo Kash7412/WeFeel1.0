@@ -31,7 +31,7 @@ const YouDidIt = () => {
           <View style={{ justifyContent: 'center', width: '100%' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
               <Pressable
-                onPress={() => router.push("/videoFeatures/share")}
+                onPress={() => router.push("/videoFeatures/Home")}
                 style={styles.nextButton}
               >
                 <Text style={styles.nextButtonText}>next</Text>
