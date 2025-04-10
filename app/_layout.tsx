@@ -203,6 +203,20 @@ const RootLayout = () => {
           headerTitle: "",
         }}
       />
+      <Stack.Screen
+        name="admin/terms"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="admin/privacy"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 };

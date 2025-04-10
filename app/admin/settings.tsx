@@ -7,6 +7,8 @@ import {
   Pressable,
   Alert,
   Dimensions,
+  Linking,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "../../utils/supabase";
@@ -20,6 +22,20 @@ const Settings: FC = () => {
     router.push(path);
   };
 
+  const handleReview = async () => {
+    const iosAppStoreUrl = "https://apps.apple.com/app/idYOUR_APP_ID"; // Replace with your real ID
+    const androidPlayStoreUrl = "market://details?id=com.yourcompany.yourapp"; // Replace with your real package name
+
+    const url = Platform.OS === "ios" ? iosAppStoreUrl : androidPlayStoreUrl;
+
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert("Error", "Unable to open the store link.");
+    }
+  };
+
   const handleDeleteAccount = (): void => {
     Alert.alert(
       "Delete Account",
@@ -28,10 +44,42 @@ const Settings: FC = () => {
         { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
-          onPress: async () => {
-            console.log("Delete Account"); // TODO: Implement actual delete logic
-          },
           style: "destructive",
+          onPress: async () => {
+            try {
+              const { data, error } = await supabase.auth.getUser();
+              if (error || !data.user) {
+                Alert.alert("Error", "Unable to fetch user.");
+                return;
+              }
+
+              const userId = data.user.id;
+
+              // Delete from `profiles` table
+              const { error: deleteProfileError } = await supabase
+                .from("profiles")
+                .delete()
+                .eq("id", userId);
+
+              if (deleteProfileError) {
+                Alert.alert("Error", "Failed to delete profile data.");
+                return;
+              }
+
+              // Delete user
+              const { error: deleteUserError } = await supabase.auth.admin.deleteUser(userId);
+              if (deleteUserError) {
+                Alert.alert("Error", deleteUserError.message);
+                return;
+              }
+
+              Alert.alert("Account Deleted", "Your account has been successfully deleted.");
+              router.replace("/");
+            } catch (err) {
+              console.error("Delete Error:", err);
+              Alert.alert("Error", "Something went wrong.");
+            }
+          },
         },
       ]
     );
@@ -65,7 +113,7 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Report a Bug / Make a Suggestion</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => handleNavigation("/videoFeatures/Home")}>
+        <Pressable style={styles.option} onPress={handleReview}>
           <Text style={styles.optionText}>Review Us in the App Store</Text>
         </Pressable>
 
@@ -73,20 +121,23 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Log Out</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => Alert.alert("Coming Soon", "Notification permissions will be added shortly.")}>
+        <Pressable
+          style={styles.option}
+          onPress={() => Alert.alert("Coming Soon", "Notification permissions will be added shortly.")}
+        >
           <Text style={styles.optionText}>Allow Notifications</Text>
         </Pressable>
-        
+
         <Pressable style={styles.dangerZone} onPress={handleDeleteAccount}>
           <Text style={styles.dangerText}>Delete Account</Text>
         </Pressable>
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable onPress={() => handleNavigation("/terms")}>
+        <Pressable onPress={() => handleNavigation("/admin/terms")}>
           <Text style={styles.footerText}>Terms & Conditions</Text>
         </Pressable>
-        <Pressable onPress={() => handleNavigation("/privacy")}>
+        <Pressable onPress={() => handleNavigation("/admin/privacy")}>
           <Text style={styles.footerText}>Privacy Policy</Text>
         </Pressable>
       </View>
