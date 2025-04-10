@@ -8,7 +8,6 @@ import {
   Alert,
   Dimensions,
   Linking,
-  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "../../utils/supabase";
@@ -22,20 +21,6 @@ const Settings: FC = () => {
     router.push(path);
   };
 
-  const handleReview = async () => {
-    const iosAppStoreUrl = "https://apps.apple.com/app/idYOUR_APP_ID"; // Replace with your real ID
-    const androidPlayStoreUrl = "market://details?id=com.yourcompany.yourapp"; // Replace with your real package name
-
-    const url = Platform.OS === "ios" ? iosAppStoreUrl : androidPlayStoreUrl;
-
-    const supported = await Linking.canOpenURL(url);
-    if (supported) {
-      await Linking.openURL(url);
-    } else {
-      Alert.alert("Error", "Unable to open the store link.");
-    }
-  };
-
   const handleDeleteAccount = (): void => {
     Alert.alert(
       "Delete Account",
@@ -44,60 +29,46 @@ const Settings: FC = () => {
         { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
-          style: "destructive",
           onPress: async () => {
-            try {
-              const { data, error } = await supabase.auth.getUser();
-              if (error || !data.user) {
-                Alert.alert("Error", "Unable to fetch user.");
-                return;
-              }
-
-              const userId = data.user.id;
-
-              // Delete from `profiles` table
-              const { error: deleteProfileError } = await supabase
-                .from("profiles")
-                .delete()
-                .eq("id", userId);
-
-              if (deleteProfileError) {
-                Alert.alert("Error", "Failed to delete profile data.");
-                return;
-              }
-
-              // Delete user
-              const { error: deleteUserError } = await supabase.auth.admin.deleteUser(userId);
-              if (deleteUserError) {
-                Alert.alert("Error", deleteUserError.message);
-                return;
-              }
-
-              Alert.alert("Account Deleted", "Your account has been successfully deleted.");
-              router.replace("/");
-            } catch (err) {
-              console.error("Delete Error:", err);
-              Alert.alert("Error", "Something went wrong.");
-            }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return Alert.alert("Error", "User not found.");
+            const { error } = await supabase.auth.admin.deleteUser(user.id);
+            if (error) return Alert.alert("Error", error.message);
+            router.replace("/");
           },
+          style: "destructive",
         },
       ]
     );
   };
 
-  const handleLogout = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        Alert.alert("Logout Failed", error.message);
-        return;
-      }
+  const handleLogout = (): void => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Log Out",
+          onPress: async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+              Alert.alert("Logout Failed", error.message);
+            } else {
+              router.replace("/");
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
 
-      router.replace("/");
-    } catch (error) {
-      console.error("Logout Error:", error);
-      Alert.alert("Logout Failed", "Something went wrong.");
-    }
+  const handleReviewApp = () => {
+    const appStoreURL = "https://apps.apple.com/app/idYOUR_APP_ID"; // Replace with your actual App Store URL
+    Linking.openURL(appStoreURL).catch(() =>
+      Alert.alert("Error", "Unable to open App Store.")
+    );
   };
 
   return (
@@ -109,11 +80,11 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Update Profile</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => handleNavigation("/report-bug")}>
+        <Pressable style={styles.option} onPress={() => handleNavigation("/admin/report-bug")}>
           <Text style={styles.optionText}>Report a Bug / Make a Suggestion</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={handleReview}>
+        <Pressable style={styles.option} onPress={handleReviewApp}>
           <Text style={styles.optionText}>Review Us in the App Store</Text>
         </Pressable>
 
@@ -121,10 +92,7 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Log Out</Text>
         </Pressable>
 
-        <Pressable
-          style={styles.option}
-          onPress={() => Alert.alert("Coming Soon", "Notification permissions will be added shortly.")}
-        >
+        <Pressable style={styles.option} onPress={() => Alert.alert("Coming Soon", "Notification permissions will be added shortly.")}>
           <Text style={styles.optionText}>Allow Notifications</Text>
         </Pressable>
 

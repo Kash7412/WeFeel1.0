@@ -217,6 +217,13 @@ const RootLayout = () => {
           headerTitle: "",
         }}
       />
+      <Stack.Screen
+        name="admin/report-bug"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 };
