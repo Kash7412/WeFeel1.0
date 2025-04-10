@@ -1,4 +1,5 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { Linking } from "react-native";
 import {
   View,
   Text,
@@ -17,6 +18,13 @@ const ShareMedia = () => {
   const videoUri = Array.isArray(params.uri) ? params.uri[0] : params.uri;
 
   const shareToPlatform = async (platform: string) => {
+    if (platform === "Messages") {
+      const message = encodeURIComponent("Check this out! https://www.wefeel.com");
+      const smsURL = `sms:&body=${message}`;
+      Linking.openURL(smsURL);
+      return;
+    }
+  
     if (videoUri && (await Sharing.isAvailableAsync())) {
       await Sharing.shareAsync(videoUri, {
         mimeType: "video/mp4",

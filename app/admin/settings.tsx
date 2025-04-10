@@ -10,6 +10,11 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "../../utils/supabase";
+import {
+  requestNotificationPermissions,
+  scheduleDailyReminder,
+  cancelAllNotifications,
+} from "../../utils/notifications";
 
 const { width, height } = Dimensions.get("window");
 
@@ -73,10 +78,16 @@ const Settings: FC = () => {
           <Text style={styles.optionText}>Log Out</Text>
         </Pressable>
 
-        <Pressable style={styles.option} onPress={() => Alert.alert("Coming Soon", "Notification permissions will be added shortly.")}>
+        <Pressable style={styles.option} onPress={async () => {
+          const granted = await requestNotificationPermissions();
+          if (granted) {
+            await scheduleDailyReminder();
+          }
+        }}
+        >
           <Text style={styles.optionText}>Allow Notifications</Text>
         </Pressable>
-        
+
         <Pressable style={styles.dangerZone} onPress={handleDeleteAccount}>
           <Text style={styles.dangerText}>Delete Account</Text>
         </Pressable>
