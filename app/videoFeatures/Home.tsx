@@ -1,6 +1,8 @@
 import React, { FC } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from "expo-router";
+import { userPosted } from '../../utils/userPosted'; // update path if needed
+
 
 const Home: FC = () => {
     const router = useRouter();
@@ -17,6 +19,19 @@ const Home: FC = () => {
     const handleNavigation = (path: string) => {
         router.push(path);
     };
+
+    const handleFeedPress = async () => {
+        const hasPosted = await userPosted();
+    
+        if (hasPosted === true) {
+            router.push("/videoFeatures/Feed");
+        } else if (hasPosted === false) {
+            router.push("/videoFeatures/record");
+        } else {
+            console.warn("Could not determine if user has posted.");
+        }
+    };
+
 
     return (
         <View style={styles.container}>
@@ -102,7 +117,7 @@ const Home: FC = () => {
                 <View style={[styles.fullOverlay, { height: screenHeight * 0.6 }]}>
                     <TouchableOpacity 
                         style={styles.playButton}
-                        onPress={() => handleNavigation("/videoFeatures/Feed")}
+                        onPress={handleFeedPress}
                     >
                         <Image 
                             source={require("../../assets/playicon.png")}
